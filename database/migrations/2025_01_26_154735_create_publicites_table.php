@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('publicites', function (Blueprint $table) {
             $table->id();
+            $table->date('date_start');
+            $table->date('date_end');
+            $table->string('titre');
+            $table->string('url_image');
+            $table->string('lien');
+            $table->longText('description');
+            $table->boolean('isActif');
+
             $table->timestamps();
         });
     }

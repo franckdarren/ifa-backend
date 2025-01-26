@@ -6,5 +6,47 @@ use Illuminate\Database\Eloquent\Model;
 
 class Article extends Model
 {
-    //
+    protected $fillable = [
+        'nom',
+        'description',
+        'prix',
+        'prixPromotion',
+        'quantité',
+        'isDisponible',
+        'isPromotion',
+        'pourcentageReduction',
+        'boutique_id', // Lien avec la boutique de l'article
+        'sous_categorie_id', // Lien avec la sous-catégorie de l'article
+    ];
+
+    /**
+     * Relation avec le modèle `Boutique`.
+     * Un article appartient à une boutique.
+     */
+    public function boutique()
+    {
+        return $this->belongsTo(Boutique::class);
+    }
+
+    /**
+     * Relation avec le modèle `SousCategorie`.
+     * Un article appartient à une sous-catégorie.
+     */
+    public function sousCategorie()
+    {
+        return $this->belongsTo(SousCategorie::class);
+    }
+
+    public function commandes()
+    {
+        return $this->belongsToMany(Commande::class, 'article_commandes')
+            ->withPivot('quantite', 'prix', 'reduction') // Informations supplémentaires de la table pivot
+            ->withTimestamps();
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ImageArticle::class);
+    }
+
 }

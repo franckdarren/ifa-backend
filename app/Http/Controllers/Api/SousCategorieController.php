@@ -2,48 +2,79 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\SousCategorie;
+use App\Http\Controllers\Controller;
 
 class SousCategorieController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Récupérer toutes les sous-catégories
     public function index()
     {
-        //
+        $sousCategories = SousCategorie::with('categorie')->get(); // Inclut la catégorie associée
+        return response()->json($sousCategories);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Récupérer une sous-catégorie spécifique par ID
+    public function show($id)
+    {
+        $sousCategorie = SousCategorie::with('categorie')->find($id);
+
+        if (!$sousCategorie) {
+            return response()->json(['message' => 'Sous-catégorie non trouvée'], 404);
+        }
+
+        return response()->json($sousCategorie);
+    }
+
+    // Créer une nouvelle sous-catégorie
     public function store(Request $request)
     {
-        //
+        // Validation des données
+        $validatedData = $request->validate([
+            'nom' => 'required|string|max:255',
+            'categorie_id' => 'nullable|exists:categories,id',
+        ]);
+
+        // Créer la sous-catégorie
+        $sousCategorie = SousCategorie::create($validatedData);
+
+        return response()->json($sousCategorie, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // Mettre à jour une sous-catégorie existante
+    public function update(Request $request, $id)
     {
-        //
+        $sousCategorie = SousCategorie::find($id);
+
+        if (!$sousCategorie) {
+            return response()->json(['message' => 'Sous-catégorie non trouvée'], 404);
+        }
+
+        // Validation des données
+        $validatedData = $request->validate([
+            'nom' => 'required|string|max:255',
+            'categorie_id' => 'nullable|exists:categories,id',
+        ]);
+
+        // Mettre à jour la sous-catégorie
+        $sousCategorie->update($validatedData);
+
+        return response()->json($sousCategorie);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Supprimer une sous-catégorie
+    public function destroy($id)
     {
-        //
-    }
+        $sousCategorie = SousCategorie::find($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if (!$sousCategorie) {
+            return response()->json(['message' => 'Sous-catégorie non trouvée'], 404);
+        }
+
+        // Supprimer la sous-catégorie
+        $sousCategorie->delete();
+
+        return response()->json(['message' => 'Sous-catégorie supprimée avec succès']);
     }
 }

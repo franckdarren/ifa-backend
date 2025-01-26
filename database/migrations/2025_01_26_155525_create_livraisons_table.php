@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('livraisons', function (Blueprint $table) {
             $table->id();
+            $table->string('adresse');
+            $table->string('details');
+            $table->string('statut');
+            $table->string('state_livraison');
+            $table->string('ville');
+            $table->string('phone');
+            
+            $table->foreignId('commande_id')->constrained('commandes')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+
+
             $table->timestamps();
         });
     }
