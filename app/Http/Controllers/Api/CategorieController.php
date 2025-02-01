@@ -6,6 +6,7 @@ use App\Models\Categorie;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class CategorieController extends Controller
 {
@@ -28,62 +29,93 @@ class CategorieController extends Controller
         return response()->json($categorie);
     }
 
-    // Créer une nouvelle catégorie
     public function store(Request $request)
     {
         // Validation des données
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'nom' => 'required|string|max:255',
             'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // Image optionnelle
         ]);
 
-        // Stocker l'image et récupérer le chemin
-        if ($request->hasFile('image')) {
-            // Stocker l'image dans storage/app/public/categories
-            $imagePath = $request->file('image')->store('public/categories');
-
-            // Générer l'URL accessible publiquement
-            $imageUrl = Storage::url($imagePath);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Avec DigitalOcean Space
-        // if ($request->hasFile('image')) {
-        //     // Stocker dans DigitalOcean Spaces
-        //     $imagePath = $request->file('image')->store('categories', 'spaces');
+        $imageUrl = null;
 
-        //     // Générer une URL complète de l'image
-        //     $imageUrl = Storage::disk('spaces')->url($imagePath);
-        // }
+        // ✅ Gestion de l'upload de l'image (Stockage local ou DigitalOcean Spaces)
+        if ($request->hasFile('image')) {
+            if (env('USE_DIGITALOCEAN_SPACES', false)) {
+                // 🔥 Stockage sur DigitalOcean Spaces
+                $imagePath = $request->file('image')->store('categories', 'spaces');
+                $imageUrl = Storage::disk('spaces')->url($imagePath);
+            } else {
+                // 📁 Stockage local
+                $imagePath = $request->file('image')->store('public/categories');
+                $imageUrl = Storage::url($imagePath);
+            }
+        }
 
-        // Créer la catégorie
+        // 🔥 Création de la catégorie
         $categorie = Categorie::create([
             'nom' => $request->nom,
             'description' => $request->description,
-            'image_url' => $imageUrl ?? null,
+            'image_url' => $imageUrl,
         ]);
 
-        return response()->json($categorie, 201);
+        return response()->json([
+            'message' => 'Catégorie créée avec succès !',
+            'categorie' => $categorie
+        ], 201);
     }
 
-    // Mettre à jour une catégorie existante
+    // ✅ Mettre à jour une catégorie existante avec gestion de l'image
     public function update(Request $request, $id)
     {
         $categorie = Categorie::find($id);
-
         if (!$categorie) {
             return response()->json(['message' => 'Catégorie non trouvée'], 404);
         }
 
         // Validation des données
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'nom' => 'required|string|max:255',
             'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image optionnelle
         ]);
 
-        // Mettre à jour la catégorie
-        $categorie->update($validatedData);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
-        return response()->json($categorie);
+        // ✅ Gestion de l'upload d'une nouvelle image
+        if ($request->hasFile('image')) {
+            if (env('USE_DIGITALOCEAN_SPACES', false)) {
+                // 🔥 Stocker sur DigitalOcean Spaces
+                $imagePath = $request->file('image')->store('categories', 'spaces');
+                $imageUrl = Storage::disk('spaces')->url($imagePath);
+            } else {
+                // 📁 Stockage local
+                $imagePath = $request->file('image')->store('public/categories');
+                $imageUrl = Storage::url($imagePath);
+            }
+
+            // 🗑️ Supprimer l'ancienne image
+            if ($categorie->image_url) {
+                Storage::delete($categorie->image_url);
+            }
+
+            $categorie->image_url = $imageUrl;
+        }
+
+        // ✅ Mise à jour des autres champs
+        $categorie->update($request->except('image'));
+
+        return response()->json([
+            'message' => 'Catégorie mise à jour avec succès !',
+            'categorie' => $categorie
+        ], 200);
     }
 
     // Supprimer une catégorie

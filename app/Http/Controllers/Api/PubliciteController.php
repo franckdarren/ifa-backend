@@ -6,6 +6,7 @@ use App\Models\Publicite;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class PubliciteController extends Controller
 {
@@ -28,39 +29,40 @@ class PubliciteController extends Controller
         return response()->json($publicite);
     }
 
-    // Créer une nouvelle publicité
+    // ✅ Créer une nouvelle publicité avec gestion d'image
     public function store(Request $request)
     {
         // Validation des données
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'date_start' => 'required|date',
             'date_end' => 'required|date|after_or_equal:date_start',
             'titre' => 'required|string|max:255',
-            'url_image' => 'required|string|max:255',
             'lien' => 'required|string|max:255',
             'description' => 'required|string',
             'isActif' => 'required|boolean',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // ✅ Image optionnelle
         ]);
 
-        // Stocker l'image et récupérer le chemin
-        if ($request->hasFile('image')) {
-            // Stocker l'image dans storage/app/public/publicites
-            $imagePath = $request->file('image')->store('public/publicites');
-
-            // Générer l'URL accessible publiquement
-            $imageUrl = Storage::url($imagePath);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Avec DigitalOcean Space
-        // if ($request->hasFile('image')) {
-        //     // Stocker dans DigitalOcean Spaces
-        //     $imagePath = $request->file('image')->store('publicites', 'spaces');
+        $imageUrl = null;
 
-        //     // Générer une URL complète de l'image
-        //     $imageUrl = Storage::disk('spaces')->url($imagePath);
-        // }
+        // ✅ Stockage de l'image (Local ou DigitalOcean Spaces)
+        if ($request->hasFile('image')) {
+            if (env('USE_DIGITALOCEAN_SPACES', false)) {
+                // 🔥 Stockage sur DigitalOcean Spaces
+                $imagePath = $request->file('image')->store('publicites', 'spaces');
+                $imageUrl = Storage::disk('spaces')->url($imagePath);
+            } else {
+                // 📁 Stockage local
+                $imagePath = $request->file('image')->store('public/publicites');
+                $imageUrl = Storage::url($imagePath);
+            }
+        }
 
-        // Créer la catégorie
+        // ✅ Création de la publicité
         $publicite = Publicite::create([
             'date_start' => $request->date_start,
             'date_end' => $request->date_end,
@@ -68,41 +70,68 @@ class PubliciteController extends Controller
             'lien' => $request->lien,
             'description' => $request->description,
             'isActif' => $request->isActif,
-
-            'url_image' => $imageUrl ?? null,
+            'url_image' => $imageUrl,
         ]);
 
-        // Créer la publicité
-        $publicite = Publicite::create($validatedData);
-
-        return response()->json($publicite, 201);
+        return response()->json([
+            'message' => 'Publicité créée avec succès !',
+            'publicite' => $publicite
+        ], 201);
     }
 
-    // Mettre à jour une publicité existante
+    // ✅ Mettre à jour une publicité avec gestion de l'image
     public function update(Request $request, $id)
     {
         $publicite = Publicite::find($id);
-
         if (!$publicite) {
             return response()->json(['message' => 'Publicité non trouvée'], 404);
         }
 
         // Validation des données
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'date_start' => 'required|date',
             'date_end' => 'required|date|after_or_equal:date_start',
             'titre' => 'required|string|max:255',
-            'url_image' => 'required|string|max:255',
             'lien' => 'required|string|max:255',
             'description' => 'required|string',
             'isActif' => 'required|boolean',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // ✅ Image optionnelle
         ]);
 
-        // Mettre à jour la publicité
-        $publicite->update($validatedData);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
-        return response()->json($publicite);
+        // ✅ Gestion de l'upload d'une nouvelle image
+        if ($request->hasFile('image')) {
+            if (env('USE_DIGITALOCEAN_SPACES', false)) {
+                // 🔥 Stocker sur DigitalOcean Spaces
+                $imagePath = $request->file('image')->store('publicites', 'spaces');
+                $imageUrl = Storage::disk('spaces')->url($imagePath);
+            } else {
+                // 📁 Stockage local
+                $imagePath = $request->file('image')->store('public/publicites');
+                $imageUrl = Storage::url($imagePath);
+            }
+
+            // 🗑️ Supprimer l'ancienne image
+            if ($publicite->url_image) {
+                Storage::delete($publicite->url_image);
+            }
+
+            $publicite->url_image = $imageUrl;
+        }
+
+        // ✅ Mise à jour des autres champs
+        $publicite->update($request->except('image'));
+
+        return response()->json([
+            'message' => 'Publicité mise à jour avec succès !',
+            'publicite' => $publicite
+        ], 200);
     }
+
+
 
     // Supprimer une publicité
     public function destroy($id)

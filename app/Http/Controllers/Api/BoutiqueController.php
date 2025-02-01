@@ -23,54 +23,53 @@ class BoutiqueController extends Controller
      */
     public function store(Request $request)
     {
+        // Validation des données
         $validator = Validator::make($request->all(), [
             'adresse' => 'required|string',
             'nom' => 'required|string',
             'phone' => 'required|string',
-            'url_logo' => 'required|string',
             'heure_ouverture' => 'required',
             'heure_fermeture' => 'required',
             'description' => 'nullable|string',
             'user_id' => 'nullable|exists:users,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validation de l'image
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Stocker l'image et récupérer le chemin
-        if ($request->hasFile('image')) {
-            // Stocker l'image dans storage/app/public/boutiques
-            $imagePath = $request->file('image')->store('public/boutiques');
+        $imageUrl = null;
 
-            // Générer l'URL accessible publiquement
-            $imageUrl = Storage::url($imagePath);
+        // ✅ Stockage de l'image (local ou DigitalOcean Spaces)
+        if ($request->hasFile('image')) {
+            if (env('USE_DIGITALOCEAN_SPACES', false)) {
+                // 🔥 Stocker dans DigitalOcean Spaces
+                $imagePath = $request->file('image')->store('boutiques', 'spaces');
+                $imageUrl = Storage::disk('spaces')->url($imagePath);
+            } else {
+                // 📁 Stocker dans storage/app/public/boutiques
+                $imagePath = $request->file('image')->store('public/boutiques');
+                $imageUrl = Storage::url($imagePath);
+            }
         }
 
-        // Avec DigitalOcean Space
-        // if ($request->hasFile('image')) {
-        //     // Stocker dans DigitalOcean Spaces
-        //     $imagePath = $request->file('image')->store('boutiques', 'spaces');
-
-        //     // Générer une URL complète de l'image
-        //     $imageUrl = Storage::disk('spaces')->url($imagePath);
-        // }
-
-        // Créer la catégorie
+        // 🔥 Création de la boutique avec l'URL de l'image
         $boutique = Boutique::create([
             'adresse' => $request->adresse,
             'nom' => $request->nom,
             'phone' => $request->phone,
-            'url_logo' => $request->url_logo,
             'heure_ouverture' => $request->heure_ouverture,
             'heure_fermeture' => $request->heure_fermeture,
             'description' => $request->description,
             'user_id' => $request->user_id,
-
-            'image_url' => $imageUrl ?? null,
+            'image_url' => $imageUrl, // ✅ Sauvegarde de l'URL dans la base de données
         ]);
 
-        return response()->json($boutique, 201);
+        return response()->json([
+            'message' => 'Boutique créée avec succès !',
+            'boutique' => $boutique
+        ], 201);
     }
 
     /**
@@ -99,20 +98,41 @@ class BoutiqueController extends Controller
             'adresse' => 'required|string',
             'nom' => 'required|string',
             'phone' => 'required|string',
-            'url_logo' => 'required|string',
             'heure_ouverture' => 'required',
             'heure_fermeture' => 'required',
             'description' => 'nullable|string',
             'user_id' => 'nullable|exists:users,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $boutique->update($request->all());
+        // ✅ Gestion de l'upload d'une nouvelle image
+        if ($request->hasFile('image')) {
+            if (env('USE_DIGITALOCEAN_SPACES', false)) {
+                // 🔥 Stocker dans DigitalOcean Spaces
+                $imagePath = $request->file('image')->store('boutiques', 'spaces');
+                $imageUrl = Storage::disk('spaces')->url($imagePath);
+            } else {
+                // 📁 Stocker dans storage/app/public/boutiques
+                $imagePath = $request->file('image')->store('public/boutiques');
+                $imageUrl = Storage::url($imagePath);
+            }
+
+            // 🗑️ Supprimer l'ancienne image (facultatif)
+            if ($boutique->image_url) {
+                Storage::delete($boutique->image_url);
+            }
+
+            $boutique->image_url = $imageUrl;
+        }
+
+        $boutique->update($request->except('image'));
         return response()->json($boutique, 200);
     }
+
 
     /**
      * Remove the specified resource from storage.
