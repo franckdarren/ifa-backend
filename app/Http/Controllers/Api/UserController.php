@@ -26,7 +26,7 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',  // Validation unique sur le champ email
-            'role' => 'required|in:admin,user',  // Exemple de validation pour 'role'
+            'role' => 'required|in:Administrateur,Client,Boutique',  // Exemple de validation pour 'role'
             'password' => 'required|string|min:6',
         ]);
 
@@ -72,8 +72,6 @@ class UserController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'string|max:255',
-            'email' => 'email|unique:users,email,' . $id,
-            'phone_number' => 'unique:users,phone_number,' . $id,
             'password' => 'nullable|string|min:6',
         ]);
 
