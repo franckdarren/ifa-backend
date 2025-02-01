@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminAuthenticatedSessionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -12,6 +14,18 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        if (auth()->user()->role === 'Administrateur') {
+            return view('dashboard');
+        } else {
+            // Déconnecter l'utilisateur non autorisé via le garde 'web'
+            Auth::guard('web')->logout();
+
+            // Rediriger l'utilisateur vers la page de connexion avec un message d'erreur
+            return redirect('/login')->withErrors([
+                'access' => 'Accès réservé aux administrateurs.'
+            ]);
+        }
     })->name('dashboard');
 });
+
+
