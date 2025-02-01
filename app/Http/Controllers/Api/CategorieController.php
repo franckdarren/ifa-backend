@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Categorie;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class CategorieController extends Controller
 {
@@ -36,8 +37,30 @@ class CategorieController extends Controller
             'description' => 'required|string',
         ]);
 
+        // Stocker l'image et récupérer le chemin
+        if ($request->hasFile('image')) {
+            // Stocker l'image dans storage/app/public/categories
+            $imagePath = $request->file('image')->store('public/categories');
+
+            // Générer l'URL accessible publiquement
+            $imageUrl = Storage::url($imagePath);
+        }
+
+        // Avec DigitalOcean Space
+        // if ($request->hasFile('image')) {
+        //     // Stocker dans DigitalOcean Spaces
+        //     $imagePath = $request->file('image')->store('categories', 'spaces');
+
+        //     // Générer une URL complète de l'image
+        //     $imageUrl = Storage::disk('spaces')->url($imagePath);
+        // }
+
         // Créer la catégorie
-        $categorie = Categorie::create($validatedData);
+        $categorie = Categorie::create([
+            'nom' => $request->nom,
+            'description' => $request->description,
+            'image_url' => $imageUrl ?? null,
+        ]);
 
         return response()->json($categorie, 201);
     }

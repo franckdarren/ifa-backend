@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Boutique;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class BoutiqueController extends Controller
@@ -37,7 +38,38 @@ class BoutiqueController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $boutique = Boutique::create($request->all());
+        // Stocker l'image et récupérer le chemin
+        if ($request->hasFile('image')) {
+            // Stocker l'image dans storage/app/public/boutiques
+            $imagePath = $request->file('image')->store('public/boutiques');
+
+            // Générer l'URL accessible publiquement
+            $imageUrl = Storage::url($imagePath);
+        }
+
+        // Avec DigitalOcean Space
+        // if ($request->hasFile('image')) {
+        //     // Stocker dans DigitalOcean Spaces
+        //     $imagePath = $request->file('image')->store('boutiques', 'spaces');
+
+        //     // Générer une URL complète de l'image
+        //     $imageUrl = Storage::disk('spaces')->url($imagePath);
+        // }
+
+        // Créer la catégorie
+        $boutique = Boutique::create([
+            'adresse' => $request->adresse,
+            'nom' => $request->nom,
+            'phone' => $request->phone,
+            'url_logo' => $request->url_logo,
+            'heure_ouverture' => $request->heure_ouverture,
+            'heure_fermeture' => $request->heure_fermeture,
+            'description' => $request->description,
+            'user_id' => $request->user_id,
+
+            'image_url' => $imageUrl ?? null,
+        ]);
+
         return response()->json($boutique, 201);
     }
 

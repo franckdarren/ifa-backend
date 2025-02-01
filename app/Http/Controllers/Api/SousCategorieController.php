@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Models\SousCategorie;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class SousCategorieController extends Controller
 {
@@ -36,8 +37,30 @@ class SousCategorieController extends Controller
             'categorie_id' => 'nullable|exists:categories,id',
         ]);
 
+        // Stocker l'image et récupérer le chemin
+        if ($request->hasFile('image')) {
+            // Stocker l'image dans storage/app/public/sous_categories
+            $imagePath = $request->file('image')->store('public/sous_categories');
+
+            // Générer l'URL accessible publiquement
+            $imageUrl = Storage::url($imagePath);
+        }
+
+        // Avec DigitalOcean Space
+        // if ($request->hasFile('image')) {
+        //     // Stocker dans DigitalOcean Spaces
+        //     $imagePath = $request->file('image')->store('sous_categories', 'spaces');
+
+        //     // Générer une URL complète de l'image
+        //     $imageUrl = Storage::disk('spaces')->url($imagePath);
+        // }
+
         // Créer la sous-catégorie
-        $sousCategorie = SousCategorie::create($validatedData);
+        $sousCategorie = SousCategorie::create([
+            'nom' => $request->nom,
+            'categorie_id' => $request->categorie_id,
+            'image_url' => $imageUrl ?? null,
+        ]);
 
         return response()->json($sousCategorie, 201);
     }

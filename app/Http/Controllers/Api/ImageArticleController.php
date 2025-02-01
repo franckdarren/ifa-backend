@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\ImageArticle;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ImageArticleController extends Controller
@@ -29,16 +30,36 @@ class ImageArticleController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $article = Article::find($id);
-        if (!$article) {
+        $image = Article::find($id);
+        if (!$image) {
             return response()->json(['message' => 'Article non trouvé'], 404);
         }
 
-        $image = new ImageArticle();
-        $image->url_photo = $request->url_photo;
-        $image->couleur = $request->couleur;
-        $image->article_id = $id;
-        $image->save();
+        // Stocker l'image et récupérer le chemin
+        if ($request->hasFile('image')) {
+            // Stocker l'image dans storage/app/public/image_articles
+            $imagePath = $request->file('image')->store('public/image_articles');
+
+            // Générer l'URL accessible publiquement
+            $imageUrl = Storage::url($imagePath);
+        }
+
+        // Avec DigitalOcean Space
+        // if ($request->hasFile('image')) {
+        //     // Stocker dans DigitalOcean Spaces
+        //     $imagePath = $request->file('image')->store('image_articles', 'spaces');
+
+        //     // Générer une URL complète de l'image
+        //     $imageUrl = Storage::disk('spaces')->url($imagePath);
+        // }
+
+        // Créer la catégorie
+        $image = ImageArticle::create([
+            'couleur' => $request->couleur,
+            'article_id' => $request->article_id,
+
+            'url_photo' => $imageUrl ?? null,
+        ]);
 
         return response()->json($image, 201);
     }

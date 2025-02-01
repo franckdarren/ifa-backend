@@ -13,6 +13,8 @@ return new class extends Migration {
         Schema::create('sous_categories', function (Blueprint $table) {
             $table->id();
             $table->string('nom');
+            $table->string('url_image')->nullable();
+
             $table->foreignId('categorie_id')->nullable()->constrained('categories')->onDelete('cascade');
 
             $table->timestamps();
