@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('description');
             $table->string('phone');
-            $table->enum('role', ['En attente de traitement', 'En cours', 'Rejetée', 'Remboursée'])->default('En attente de traitement');
+            $table->enum('statut', ['En attente de traitement', 'En cours', 'Rejetée', 'Remboursée'])->default('En attente de traitement');
             $table->foreignId('commande_id')->constrained('commandes')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 

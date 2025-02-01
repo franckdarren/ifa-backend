@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,10 +15,10 @@ return new class extends Migration
             $table->string('adresse');
             $table->string('details');
             $table->string('statut');
-            $table->string('state_livraison');
+            $table->date('date_livraison');
             $table->string('ville');
             $table->string('phone');
-            
+
             $table->foreignId('commande_id')->constrained('commandes')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
 

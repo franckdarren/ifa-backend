@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\Boutique;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class BoutiqueController extends Controller
 {
@@ -12,7 +14,7 @@ class BoutiqueController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(Boutique::all(), 200);
     }
 
     /**
@@ -20,7 +22,23 @@ class BoutiqueController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'adresse' => 'required|string',
+            'nom' => 'required|string',
+            'phone' => 'required|string',
+            'url_logo' => 'required|string',
+            'heure_ouverture' => 'required',
+            'heure_fermeture' => 'required',
+            'description' => 'nullable|string',
+            'user_id' => 'nullable|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $boutique = Boutique::create($request->all());
+        return response()->json($boutique, 201);
     }
 
     /**
@@ -28,7 +46,11 @@ class BoutiqueController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $boutique = Boutique::find($id);
+        if (!$boutique) {
+            return response()->json(['message' => 'Boutique non trouvée'], 404);
+        }
+        return response()->json($boutique, 200);
     }
 
     /**
@@ -36,7 +58,28 @@ class BoutiqueController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $boutique = Boutique::find($id);
+        if (!$boutique) {
+            return response()->json(['message' => 'Boutique non trouvée'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'adresse' => 'required|string',
+            'nom' => 'required|string',
+            'phone' => 'required|string',
+            'url_logo' => 'required|string',
+            'heure_ouverture' => 'required',
+            'heure_fermeture' => 'required',
+            'description' => 'nullable|string',
+            'user_id' => 'nullable|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $boutique->update($request->all());
+        return response()->json($boutique, 200);
     }
 
     /**
@@ -44,6 +87,12 @@ class BoutiqueController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $boutique = Boutique::find($id);
+        if (!$boutique) {
+            return response()->json(['message' => 'Boutique non trouvée'], 404);
+        }
+
+        $boutique->delete();
+        return response()->json(['message' => 'Boutique supprimée avec succès'], 200);
     }
 }

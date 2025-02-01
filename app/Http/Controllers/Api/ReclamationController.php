@@ -2,48 +2,89 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\Reclamation;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class ReclamationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Récupérer toutes les réclamations
     public function index()
     {
-        //
+        $reclamations = Reclamation::all();
+        return response()->json($reclamations, 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Récupérer une réclamation spécifique
+    public function show($id)
+    {
+        $reclamation = Reclamation::find($id);
+        if (!$reclamation) {
+            return response()->json(['message' => 'Réclamation non trouvée'], 404);
+        }
+        return response()->json($reclamation, 200);
+    }
+
+    // Ajouter une nouvelle réclamation
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'description' => 'required|string',
+            'phone' => 'required|string',
+            'statut' => 'required|in:En attente de traitement,En cours,Rejetée,Remboursée',
+            'commande_id' => 'required|exists:commandes,id',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $reclamation = Reclamation::create([
+            'description' => $request->description,
+            'phone' => $request->phone,
+            'statut' => $request->statut,
+            'commande_id' => $request->commande_id,
+            'user_id' => $request->user_id,
+        ]);
+
+        return response()->json($reclamation, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // Mettre à jour une réclamation
+    public function update(Request $request, $id)
     {
-        //
+        $reclamation = Reclamation::find($id);
+        if (!$reclamation) {
+            return response()->json(['message' => 'Réclamation non trouvée'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'description' => 'string',
+            'phone' => 'string',
+            'statut' => 'in:En attente de traitement,En cours,Rejetée,Remboursée',
+            'commande_id' => 'exists:commandes,id',
+            'user_id' => 'exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $reclamation->update($request->all());
+        return response()->json($reclamation, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Supprimer une réclamation
+    public function destroy($id)
     {
-        //
-    }
+        $reclamation = Reclamation::find($id);
+        if (!$reclamation) {
+            return response()->json(['message' => 'Réclamation non trouvée'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $reclamation->delete();
+        return response()->json(['message' => 'Réclamation supprimée avec succès'], 200);
     }
 }

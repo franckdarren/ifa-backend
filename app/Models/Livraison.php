@@ -10,7 +10,7 @@ class Livraison extends Model
         'adresse',
         'details',
         'statut',
-        'state_livraison',
+        'date_livraison',
         'ville',
         'phone',
         'commande_id',

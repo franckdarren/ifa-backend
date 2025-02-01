@@ -4,9 +4,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\BoutiqueController;
+use App\Http\Controllers\Api\CommandeController;
 use App\Http\Controllers\Api\CategorieController;
+use App\Http\Controllers\Api\LivraisonController;
 use App\Http\Controllers\Api\PubliciteController;
+use App\Http\Controllers\Api\ReclamationController;
+use App\Http\Controllers\Api\ImageArticleController;
 use App\Http\Controllers\Api\SousCategorieController;
+use App\Http\Controllers\Api\ArticleCommandeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -54,5 +61,54 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{id}', [SousCategorieController::class, 'destroy']); // Supprimer une sous-catégorie
     });
 
+    // Gestion boutiques
+    Route::get('/boutiques', [BoutiqueController::class, 'index']);
+    Route::post('/boutiques', [BoutiqueController::class, 'store']);
+    Route::get('/boutiques/{id}', [BoutiqueController::class, 'show']);
+    Route::put('/boutiques/{id}', [BoutiqueController::class, 'update']);
+    Route::delete('/boutiques/{id}', [BoutiqueController::class, 'destroy']);
+
+    // Gestion Commandes
+    Route::get('/commandes', [CommandeController::class, 'index']);
+    Route::post('/commandes', [CommandeController::class, 'store']);
+    Route::get('/commandes/{id}', [CommandeController::class, 'show']);
+    Route::put('/commandes/{id}', [CommandeController::class, 'update']);
+    Route::delete('/commandes/{id}', [CommandeController::class, 'destroy']);
+
+    // Gestion des articles
+    Route::get('/articles', [ArticleController::class, 'index']);
+    Route::post('/articles', [ArticleController::class, 'store']);
+    Route::get('/articles/{id}', [ArticleController::class, 'show']);
+    Route::put('/articles/{id}', [ArticleController::class, 'update']);
+    Route::delete('/articles/{id}', [ArticleController::class, 'destroy']);
+
+    // Gestion des article_commandes
+    Route::post('/commandes/{commande_id}/articles', [ArticleCommandeController::class, 'attachArticle']);
+    Route::delete('/commandes/{commande_id}/articles/{article_id}', [ArticleCommandeController::class, 'detachArticle']);
+
+    // Gestion image articles
+    Route::prefix('articles/{id}/images')->group(function () {
+        Route::get('/', [ImageArticleController::class, 'index']); // Récupérer toutes les images d'un article
+        Route::post('/', [ImageArticleController::class, 'store']); // Ajouter une nouvelle image pour un article
+    });
+    Route::prefix('image-articles')->group(function () {
+        Route::put('/{id}', [ImageArticleController::class, 'update']); // Mettre à jour une image
+        Route::delete('/{id}', [ImageArticleController::class, 'destroy']); // Supprimer une image
+        Route::get('/{id}', [ImageArticleController::class, 'show']);
+    });
+
+    // Gestion des livraisons
+    Route::get('livraisons', [LivraisonController::class, 'index']);
+    Route::get('livraisons/{id}', [LivraisonController::class, 'show']);
+    Route::post('livraisons', [LivraisonController::class, 'store']);
+    Route::put('livraisons/{id}', [LivraisonController::class, 'update']);
+    Route::delete('livraisons/{id}', [LivraisonController::class, 'destroy']);
+
+    // Gestion des reclamations
+    Route::get('reclamations', [ReclamationController::class, 'index']);
+    Route::get('reclamations/{id}', [ReclamationController::class, 'show']);
+    Route::post('reclamations', [ReclamationController::class, 'store']);
+    Route::put('reclamations/{id}', [ReclamationController::class, 'update']);
+    Route::delete('reclamations/{id}', [ReclamationController::class, 'destroy']);
 
 });
