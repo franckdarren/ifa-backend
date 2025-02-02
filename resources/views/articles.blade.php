@@ -7,8 +7,8 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex justify-center">
-                {{-- @livewire('dashboard-count') --}}
+            <div class="flex justify-center overflow-x-auto w-full">
+                @livewire('list-article')
             </div>
         </div>
     </div>

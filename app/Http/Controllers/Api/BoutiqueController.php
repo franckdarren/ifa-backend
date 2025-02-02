@@ -23,7 +23,7 @@ class BoutiqueController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation des données
+        // ✅ Validation des données
         $validator = Validator::make($request->all(), [
             'adresse' => 'required|string',
             'nom' => 'required|string',
@@ -32,7 +32,7 @@ class BoutiqueController extends Controller
             'heure_fermeture' => 'required',
             'description' => 'nullable|string',
             'user_id' => 'nullable|exists:users,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validation de l'image
+            'url_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Correction ici
         ]);
 
         if ($validator->fails()) {
@@ -41,20 +41,22 @@ class BoutiqueController extends Controller
 
         $imageUrl = null;
 
-        // ✅ Stockage de l'image (local ou DigitalOcean Spaces)
-        if ($request->hasFile('image')) {
+        // ✅ Vérifier et stocker l'image correctement
+        if ($request->hasFile('url_logo')) { // 🔥 Correction ici
+            $file = $request->file('url_logo');
+
             if (env('USE_DIGITALOCEAN_SPACES', false)) {
                 // 🔥 Stocker dans DigitalOcean Spaces
-                $imagePath = $request->file('image')->store('boutiques', 'spaces');
+                $imagePath = $file->store('boutiques', 'spaces');
                 $imageUrl = Storage::disk('spaces')->url($imagePath);
             } else {
-                // 📁 Stocker dans storage/app/public/boutiques
-                $imagePath = $request->file('image')->store('public/boutiques');
+                // 📁 Stocker localement dans storage/app/public/boutiques
+                $imagePath = $file->store('public/boutiques');
                 $imageUrl = Storage::url($imagePath);
             }
         }
 
-        // 🔥 Création de la boutique avec l'URL de l'image
+        // ✅ Création de la boutique avec l'image
         $boutique = Boutique::create([
             'adresse' => $request->adresse,
             'nom' => $request->nom,
@@ -63,7 +65,7 @@ class BoutiqueController extends Controller
             'heure_fermeture' => $request->heure_fermeture,
             'description' => $request->description,
             'user_id' => $request->user_id,
-            'image_url' => $imageUrl, // ✅ Sauvegarde de l'URL dans la base de données
+            'url_logo' => $imageUrl, // 🔥 Correction ici
         ]);
 
         return response()->json([
@@ -71,6 +73,7 @@ class BoutiqueController extends Controller
             'boutique' => $boutique
         ], 201);
     }
+
 
     /**
      * Display the specified resource.
@@ -102,7 +105,7 @@ class BoutiqueController extends Controller
             'heure_fermeture' => 'required',
             'description' => 'nullable|string',
             'user_id' => 'nullable|exists:users,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'url_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -122,11 +125,11 @@ class BoutiqueController extends Controller
             }
 
             // 🗑️ Supprimer l'ancienne image (facultatif)
-            if ($boutique->image_url) {
+            if ($boutique->url_logo) {
                 Storage::delete($boutique->image_url);
             }
 
-            $boutique->image_url = $imageUrl;
+            $boutique->url_logo = $imageUrl;
         }
 
         $boutique->update($request->except('image'));

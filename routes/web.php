@@ -26,6 +26,10 @@ Route::middleware([
             ]);
         }
     })->name('dashboard');
+
+    Route::get('/articles', action: function () {
+        return view('articles');
+    })->name('articles');
 });
 
 
