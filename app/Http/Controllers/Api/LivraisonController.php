@@ -38,6 +38,8 @@ class LivraisonController extends Controller
             'phone' => 'required|string',
             'commande_id' => 'required|exists:commandes,id',
             'user_id' => 'nullable|exists:users,id',
+            'boutique_id' => 'nullable|exists:boutiques,id',
+
         ]);
 
         if ($validator->fails()) {
@@ -53,6 +55,8 @@ class LivraisonController extends Controller
             'phone' => $request->phone,
             'commande_id' => $request->commande_id,
             'user_id' => $request->user_id,
+            'boutique_id' => $request->boutique_id,
+
         ]);
 
         return response()->json($livraison, 201);
@@ -75,6 +79,8 @@ class LivraisonController extends Controller
             'phone' => 'string',
             'commande_id' => 'exists:commandes,id',
             'user_id' => 'nullable|exists:users,id',
+            'boutique_id' => 'nullable|exists:boutiques,id',
+
         ]);
 
         if ($validator->fails()) {

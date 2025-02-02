@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Commande;
 use Filament\Tables\Table;
+use App\Models\ArticleCommande;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -26,34 +28,39 @@ class ListCommande extends Component implements HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Commande::query()->orderBy('created_at', 'desc'))
+            ->query(ArticleCommande::query()->orderBy('created_at', 'desc'))
             // ->paginated(false)
             ->columns([
-                TextColumn::make('numero')
+                TextColumn::make('commande.numero')
                     ->label('Numero')
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('prix')
                     ->label('Prix')
-                    ->formatStateUsing(fn ($state) => number_format($state, 0, ',', ' ') . ' FCFA')
+                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
+                    ->summarize(Sum::make()->suffix(' FCFA'))
                     ->searchable(),
 
-                TextColumn::make('statut')
+                TextColumn::make('commande.statut')
                     ->label('Statut')
                     ->searchable(),
 
-                TextColumn::make('commentaire')
+                TextColumn::make('commande.commentaire')
                     ->label('Commentaire')
                     ->searchable(),
 
-                TextColumn::make('isLivrable')
+                TextColumn::make('commande.isLivrable')
                     ->label('Avec livraison')
-                    ->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non')
+                    ->formatStateUsing(fn($state) => $state ? 'Oui' : 'Non')
                     ->searchable(),
 
-                TextColumn::make('user.name')
+                TextColumn::make('commande.user.name')
                     ->label('Utilisateur')
+                    ->searchable(),
+
+                TextColumn::make('article.boutique.nom')
+                    ->label('Vendeur')
                     ->searchable(),
             ])
             ->headerActions([
@@ -64,7 +71,9 @@ class ListCommande extends Component implements HasForms, HasTable
             ->actions([
 
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->defaultGroup('commande.numero');
+        ;
     }
     public function render()
     {

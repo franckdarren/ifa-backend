@@ -47,15 +47,16 @@ class ListBoutique extends Component implements HasForms, HasTable
 
                 TextColumn::make('phone')
                     ->label('Phone')
-                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
                     ->searchable(),
 
                 TextColumn::make('heure_ouverture')
                     ->label('Heure ouverture')
+                    ->time('H:i')
                     ->searchable(),
 
-                TextColumn::make('Heure fermeture')
-                    ->label('Disponible')
+                TextColumn::make('heure_fermeture')
+                    ->label('Heure fermeture')
+                    ->time('H:i')
                     ->searchable(),
 
                 TextColumn::make('description')

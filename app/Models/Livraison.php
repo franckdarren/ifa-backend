@@ -14,7 +14,8 @@ class Livraison extends Model
         'ville',
         'phone',
         'commande_id',
-        'user_id', // Facultatif selon que la livraison est attribuée à un utilisateur
+        'user_id',
+        'boutique_id',
     ];
 
     /**
@@ -33,6 +34,11 @@ class Livraison extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function boutique()
+    {
+        return $this->belongsTo(Boutique::class);
     }
 
 }

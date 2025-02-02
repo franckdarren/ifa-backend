@@ -12,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\ForceDeleteAction;
@@ -40,7 +41,7 @@ class ListArticle extends Component implements HasForms, HasTable
 
                 TextColumn::make('prix')
                     ->label('Prix')
-                    ->formatStateUsing(fn ($state) => number_format($state, 0, ',', ' ') . ' FCFA')
+                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
                     ->searchable(),
 
                 TextColumn::make('quantité')
@@ -49,12 +50,12 @@ class ListArticle extends Component implements HasForms, HasTable
 
                 TextColumn::make('isDisponible')
                     ->label('Disponible')
-                    ->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non')
+                    ->formatStateUsing(fn($state) => $state ? 'Oui' : 'Non')
                     ->searchable(),
 
                 TextColumn::make('isPromotion')
                     ->label('En promotion')
-                    ->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non')
+                    ->formatStateUsing(fn($state) => $state ? 'Oui' : 'Non')
                     ->searchable(),
 
                 TextColumn::make('pourcentageReduction')
@@ -63,7 +64,7 @@ class ListArticle extends Component implements HasForms, HasTable
 
                 TextColumn::make('prixPromotion')
                     ->label('Prix promo')
-                    ->formatStateUsing(fn ($state) => number_format($state, 0, ',', ' ') . ' FCFA')
+                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
                     ->searchable(),
 
                 TextColumn::make('boutique.nom')
@@ -77,6 +78,10 @@ class ListArticle extends Component implements HasForms, HasTable
                 TextColumn::make('sousCategorie.categorie.nom')
                     ->label('Catégorie')
                     ->searchable(),
+
+                ImageColumn::make('images.url_photo')
+                    ->circular()
+                    ->stacked()
 
             ])
             ->headerActions([

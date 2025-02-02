@@ -30,4 +30,9 @@ class Boutique extends Model
     {
         return $this->hasMany(Article::class);
     }
+
+    public function livraisons()
+    {
+        return $this->hasMany(Livraison::class);
+    }
 }

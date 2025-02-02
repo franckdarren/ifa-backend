@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Article extends Model
 {
@@ -37,11 +38,11 @@ class Article extends Model
         return $this->belongsTo(SousCategorie::class);
     }
 
-    public function commandes()
+    public function commandes(): BelongsToMany
     {
         return $this->belongsToMany(Commande::class, 'article_commandes')
-            ->withPivot('quantite', 'prix', 'reduction') // Informations supplémentaires de la table pivot
-            ->withTimestamps();
+                    ->withPivot('quantite', 'prix', 'reduction')
+                    ->withTimestamps();
     }
 
     public function images()

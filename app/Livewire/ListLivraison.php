@@ -7,6 +7,7 @@ use App\Models\Boutique;
 use App\Models\Livraison;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Grouping\Group;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;
@@ -65,6 +66,10 @@ class ListLivraison extends Component implements HasForms, HasTable
                     ->label('Client')
                     ->searchable(),
 
+                TextColumn::make('boutique.nom')
+                    ->label('Vendeur')
+                    ->searchable(),
+
             ])
             ->headerActions([
 
@@ -74,7 +79,8 @@ class ListLivraison extends Component implements HasForms, HasTable
             ->actions([
 
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->defaultGroup('commande.numero');
     }
 
     public function render()

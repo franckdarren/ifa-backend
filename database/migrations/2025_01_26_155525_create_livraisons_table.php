@@ -21,6 +21,8 @@ return new class extends Migration {
 
             $table->foreignId('commande_id')->constrained('commandes')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            
+
 
 
             $table->timestamps();

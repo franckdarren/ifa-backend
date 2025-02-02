@@ -89,7 +89,7 @@ class ListSousCategorie extends Component implements HasForms, HasTable
                             ->label('Nom')
                             ->required()
                             ->default(fn($record) => $record->nom), // Lier explicitement au champ 'nom'
-                            Select::make('categorie_id')
+                        Select::make('categorie_id')
                             ->label('Catégorie')
                             ->options(Categorie::all()->pluck('nom', 'id'))
                             ->searchable()
@@ -105,7 +105,7 @@ class ListSousCategorie extends Component implements HasForms, HasTable
                         $record->update($data);
                         Notification::make()
                             ->title('Succès')
-                            ->body('Catégorie modifiée avec succès!')
+                            ->body('Sous catégorie modifiée avec succès!')
                             ->success()
                             ->send();
                     })
