@@ -9,7 +9,7 @@ class Reclamation extends Model
     protected $fillable = [
         'description',
         'phone',
-        'role',
+        'statut',
         'commande_id',
         'user_id',
     ];

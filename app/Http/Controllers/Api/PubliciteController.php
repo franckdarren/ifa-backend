@@ -40,7 +40,7 @@ class PubliciteController extends Controller
             'lien' => 'required|string|max:255',
             'description' => 'required|string',
             'isActif' => 'required|boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // ✅ Image optionnelle
+            'url_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // ✅ Image optionnelle
         ]);
 
         if ($validator->fails()) {
@@ -50,14 +50,16 @@ class PubliciteController extends Controller
         $imageUrl = null;
 
         // ✅ Stockage de l'image (Local ou DigitalOcean Spaces)
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('url_image')) {
+            $file = $request->file('url_image');
+
             if (env('USE_DIGITALOCEAN_SPACES', false)) {
                 // 🔥 Stockage sur DigitalOcean Spaces
                 $imagePath = $request->file('image')->store('publicites', 'spaces');
                 $imageUrl = Storage::disk('spaces')->url($imagePath);
             } else {
                 // 📁 Stockage local
-                $imagePath = $request->file('image')->store('public/publicites');
+                $imagePath = $file->store('publicites', 'public');
                 $imageUrl = Storage::url($imagePath);
             }
         }
@@ -95,7 +97,7 @@ class PubliciteController extends Controller
             'lien' => 'required|string|max:255',
             'description' => 'required|string',
             'isActif' => 'required|boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // ✅ Image optionnelle
+            'url_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // ✅ Image optionnelle
         ]);
 
         if ($validator->fails()) {
@@ -103,14 +105,16 @@ class PubliciteController extends Controller
         }
 
         // ✅ Gestion de l'upload d'une nouvelle image
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('url_image')) {
+            $file = $request->file('url_image');
             if (env('USE_DIGITALOCEAN_SPACES', false)) {
+                $file = $request->file('url_image');
                 // 🔥 Stocker sur DigitalOcean Spaces
                 $imagePath = $request->file('image')->store('publicites', 'spaces');
                 $imageUrl = Storage::disk('spaces')->url($imagePath);
             } else {
                 // 📁 Stockage local
-                $imagePath = $request->file('image')->store('public/publicites');
+                $imagePath = $file->store('publicites', 'public');
                 $imageUrl = Storage::url($imagePath);
             }
 

@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Boutique;
-use App\Models\Livraison;
+use App\Models\Reclamation;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -21,7 +21,7 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class ListLivraison extends Component implements HasForms, HasTable
+class ListReclamation extends Component implements HasForms, HasTable
 {
     use InteractsWithTable;
     use InteractsWithForms;
@@ -29,32 +29,24 @@ class ListLivraison extends Component implements HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Livraison::query()->orderBy('created_at', 'desc'))
+            ->query(Reclamation::query()->orderBy('created_at', 'desc'))
             // ->paginated(false)
             ->columns([
-                TextColumn::make('adresse')
-                    ->label('Adresse')
+                TextColumn::make('description')
+                    ->label('Description')
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('details')
-                    ->label('Détails')
+                TextColumn::make('phone')
+                    ->label('Téléphone')
+                    ->searchable(),
+
+                TextColumn::make('phone')
+                    ->label('Phone')
                     ->searchable(),
 
                 TextColumn::make('statut')
                     ->label('Statut')
-                    ->searchable(),
-
-                TextColumn::make('date_livraison')
-                    ->label('Date livraison')
-                    ->searchable(),
-
-                TextColumn::make('ville')
-                    ->label('Ville')
-                    ->searchable(),
-
-                TextColumn::make('phone')
-                    ->label('Téléphone')
                     ->searchable(),
 
                 TextColumn::make('commande.numero')
@@ -62,7 +54,7 @@ class ListLivraison extends Component implements HasForms, HasTable
                     ->searchable(),
 
                 TextColumn::make('user.name')
-                    ->label('Client')
+                    ->label('Description')
                     ->searchable(),
 
             ])
@@ -76,9 +68,8 @@ class ListLivraison extends Component implements HasForms, HasTable
             ])
             ->bulkActions([]);
     }
-
     public function render()
     {
-        return view('livewire.list-livraison');
+        return view('livewire.list-reclamation');
     }
 }

@@ -50,6 +50,14 @@ Route::middleware([
     Route::get('/livraisons', action: function () {
         return view('livraisons');
     })->name('livraisons');
+
+    Route::get('/reclamations', action: function () {
+        return view('reclamations');
+    })->name('reclamations');
+
+    Route::get('/publicites', action: function () {
+        return view('publicites');
+    })->name('publicites');
 });
 
 

@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Boutique;
-use App\Models\Livraison;
+use App\Models\Publicite;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -21,7 +21,7 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class ListLivraison extends Component implements HasForms, HasTable
+class ListPublicite extends Component implements HasForms, HasTable
 {
     use InteractsWithTable;
     use InteractsWithForms;
@@ -29,40 +29,39 @@ class ListLivraison extends Component implements HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Livraison::query()->orderBy('created_at', 'desc'))
+            ->query(Publicite::query()->orderBy('created_at', 'desc'))
             // ->paginated(false)
             ->columns([
-                TextColumn::make('adresse')
-                    ->label('Adresse')
+
+                TextColumn::make('date_start')
+                    ->label('Début')
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('details')
-                    ->label('Détails')
+                TextColumn::make('date_end')
+                    ->label('Fin')
                     ->searchable(),
 
-                TextColumn::make('statut')
-                    ->label('Statut')
+                TextColumn::make('titre')
+                    ->label('Titre')
                     ->searchable(),
 
-                TextColumn::make('date_livraison')
-                    ->label('Date livraison')
+                    ImageColumn::make('url_image')
+                    ->label('Image')
+                    ->url(fn($record) => asset( $record->url_image)) // Prends en compte le chemin relatif
+                    ->size(50),
+
+                TextColumn::make('lien')
+                    ->label('Lien')
                     ->searchable(),
 
-                TextColumn::make('ville')
-                    ->label('Ville')
+                TextColumn::make('description')
+                    ->label('Description')
                     ->searchable(),
 
-                TextColumn::make('phone')
-                    ->label('Téléphone')
-                    ->searchable(),
-
-                TextColumn::make('commande.numero')
-                    ->label('Commande')
-                    ->searchable(),
-
-                TextColumn::make('user.name')
-                    ->label('Client')
+                    TextColumn::make('isActif')
+                    ->label('Actif ?')
+                    ->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non')
                     ->searchable(),
 
             ])
@@ -75,10 +74,8 @@ class ListLivraison extends Component implements HasForms, HasTable
 
             ])
             ->bulkActions([]);
-    }
-
-    public function render()
+    }    public function render()
     {
-        return view('livewire.list-livraison');
+        return view('livewire.list-publicite');
     }
 }
