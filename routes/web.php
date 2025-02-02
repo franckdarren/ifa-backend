@@ -38,6 +38,18 @@ Route::middleware([
     Route::get('/categories', action: function () {
         return view('categories');
     })->name('categories');
+
+    Route::get('/sous-categories', action: function () {
+        return view('sous_categories');
+    })->name('sous-categories');
+
+    Route::get('/commandes', action: function () {
+        return view('commandes');
+    })->name('commandes');
+
+    Route::get('/livraisons', action: function () {
+        return view('livraisons');
+    })->name('livraisons');
 });
 
 

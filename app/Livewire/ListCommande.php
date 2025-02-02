@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
-use App\Models\Article;
 use Livewire\Component;
+use App\Models\Commande;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -18,7 +18,7 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class ListArticle extends Component implements HasForms, HasTable
+class ListCommande extends Component implements HasForms, HasTable
 {
     use InteractsWithTable;
     use InteractsWithForms;
@@ -26,58 +26,35 @@ class ListArticle extends Component implements HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Article::query()->orderBy('created_at', 'desc'))
+            ->query(Commande::query()->orderBy('created_at', 'desc'))
             // ->paginated(false)
             ->columns([
-                TextColumn::make('nom')
-                    ->label('Nom')
+                TextColumn::make('numero')
+                    ->label('Numero')
                     ->searchable()
                     ->sortable(),
-
-                TextColumn::make('description')
-                    ->label('Description')
-                    ->searchable(),
 
                 TextColumn::make('prix')
                     ->label('Prix')
                     ->formatStateUsing(fn ($state) => number_format($state, 0, ',', ' ') . ' FCFA')
                     ->searchable(),
 
-                TextColumn::make('quantité')
-                    ->label('Quantité')
+                TextColumn::make('statut')
+                    ->label('Statut')
                     ->searchable(),
 
-                TextColumn::make('isDisponible')
-                    ->label('Disponible')
+                TextColumn::make('commentaire')
+                    ->label('Commentaire')
+                    ->searchable(),
+
+                TextColumn::make('isLivrable')
+                    ->label('Avec livraison')
                     ->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non')
                     ->searchable(),
 
-                TextColumn::make('isPromotion')
-                    ->label('En promotion')
-                    ->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non')
+                TextColumn::make('user.name')
+                    ->label('Utilisateur')
                     ->searchable(),
-
-                TextColumn::make('pourcentageReduction')
-                    ->label('Réduction en %')
-                    ->searchable(),
-
-                TextColumn::make('prixPromotion')
-                    ->label('Prix promo')
-                    ->formatStateUsing(fn ($state) => number_format($state, 0, ',', ' ') . ' FCFA')
-                    ->searchable(),
-
-                TextColumn::make('boutique.nom')
-                    ->label('Boutique')
-                    ->searchable(),
-
-                TextColumn::make('sousCategorie.nom')
-                    ->label('Sous catégorie')
-                    ->searchable(),
-
-                TextColumn::make('sousCategorie.categorie.nom')
-                    ->label('Catégorie')
-                    ->searchable(),
-
             ])
             ->headerActions([
 
@@ -91,6 +68,6 @@ class ListArticle extends Component implements HasForms, HasTable
     }
     public function render()
     {
-        return view('livewire.list-article');
+        return view('livewire.list-commande');
     }
 }

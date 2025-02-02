@@ -35,7 +35,7 @@ class CategorieController extends Controller
         $validator = Validator::make($request->all(), [
             'nom' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // Image optionnelle
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // Image optionnelle
         ]);
 
         if ($validator->fails()) {
@@ -46,13 +46,14 @@ class CategorieController extends Controller
 
         // ✅ Gestion de l'upload de l'image (Stockage local ou DigitalOcean Spaces)
         if ($request->hasFile('image')) {
+            $file = $request->file('url_image');
             if (env('USE_DIGITALOCEAN_SPACES', false)) {
                 // 🔥 Stockage sur DigitalOcean Spaces
                 $imagePath = $request->file('image')->store('categories', 'spaces');
                 $imageUrl = Storage::disk('spaces')->url($imagePath);
             } else {
                 // 📁 Stockage local
-                $imagePath = $request->file('image')->store('public/categories');
+                $imagePath = $file->store('categories', 'public');
                 $imageUrl = Storage::url($imagePath);
             }
         }
@@ -82,7 +83,7 @@ class CategorieController extends Controller
         $validator = Validator::make($request->all(), [
             'nom' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image optionnelle
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image optionnelle
         ]);
 
         if ($validator->fails()) {
@@ -91,13 +92,14 @@ class CategorieController extends Controller
 
         // ✅ Gestion de l'upload d'une nouvelle image
         if ($request->hasFile('image')) {
+            $file = $request->file('url_image');
             if (env('USE_DIGITALOCEAN_SPACES', false)) {
                 // 🔥 Stocker sur DigitalOcean Spaces
                 $imagePath = $request->file('image')->store('categories', 'spaces');
                 $imageUrl = Storage::disk('spaces')->url($imagePath);
             } else {
                 // 📁 Stockage local
-                $imagePath = $request->file('image')->store('public/categories');
+                $imagePath = $file->store('categories', 'public');
                 $imageUrl = Storage::url($imagePath);
             }
 

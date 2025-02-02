@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{id}', [PubliciteController::class, 'destroy']); // Supprimer une publicité
     });
 
-    // Gestion des Catégories
+    // Gestion des Catégories (uniquement admin)
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategorieController::class, 'index']); // Récupérer toutes les catégories
         Route::get('{id}', [CategorieController::class, 'show']); // Récupérer une catégorie par son ID
@@ -52,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{id}', [CategorieController::class, 'destroy']); // Supprimer une catégorie
     });
 
-    // Gestion des Sous Catégories
+    // Gestion des Sous Catégories (uniquement admin)
     Route::prefix('sous-categories')->group(function () {
         Route::get('/', [SousCategorieController::class, 'index']); // Récupérer toutes les sous-catégories
         Route::get('{id}', [SousCategorieController::class, 'show']); // Récupérer une sous-catégorie par ID
