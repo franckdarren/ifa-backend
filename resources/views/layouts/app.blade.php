@@ -54,19 +54,31 @@
                     <nav class="mt-10">
                         <!-- Lien Tableau de bord -->
                         <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                data-icon=\'duo-icons:dashboard\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                data-icon=\'duo-icons:dashboard\' data-inline=\'false\'></span>'">
                             {{ __('Tableau de bord') }}
                         </x-nav-link>
 
-                        <!-- Lien Tableau de bord -->
+                        <!-- Gestion articles -->
                         <x-nav-link href="{{ route('articles') }}" :active="request()->routeIs('articles')" :icone="'<span class=\'iconify text-4xl\'
-                                                    data-icon=\'duo-icons:dashboard\' data-inline=\'false\'></span>'">
+                                                                                                    data-icon=\'duo-icons:dashboard\' data-inline=\'false\'></span>'">
                             {{ __('Gestion articles') }}
+                        </x-nav-link>
+
+                        <!-- Gestion boutiques -->
+                        <x-nav-link href="{{ route('boutiques') }}" :active="request()->routeIs('boutiques')" :icone="'<span class=\'iconify text-4xl\'
+                                                                            data-icon=\'duo-icons:dashboard\' data-inline=\'false\'></span>'">
+                            {{ __('Gestion boutiques') }}
+                        </x-nav-link>
+
+                        <!-- Gestion categories -->
+                        <x-nav-link href="{{ route('categories') }}" :active="request()->routeIs('categories')" :icone="'<span class=\'iconify text-4xl\'
+                                                    data-icon=\'duo-icons:dashboard\' data-inline=\'false\'></span>'">
+                            {{ __('Gestion categories') }}
                         </x-nav-link>
 
                         {{-- Profil --}}
                         <x-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                data-icon=\'solar:user-bold-duotone\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                data-icon=\'solar:user-bold-duotone\' data-inline=\'false\'></span>'">
                             {{ __('Profil') }}
                         </x-nav-link>
 

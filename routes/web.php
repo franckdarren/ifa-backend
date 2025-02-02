@@ -30,6 +30,14 @@ Route::middleware([
     Route::get('/articles', action: function () {
         return view('articles');
     })->name('articles');
+
+    Route::get('/boutiques', action: function () {
+        return view('boutiques');
+    })->name('boutiques');
+
+    Route::get('/categories', action: function () {
+        return view('categories');
+    })->name('categories');
 });
 
 

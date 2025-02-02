@@ -51,7 +51,7 @@ class BoutiqueController extends Controller
                 $imageUrl = Storage::disk('spaces')->url($imagePath);
             } else {
                 // 📁 Stocker localement dans storage/app/public/boutiques
-                $imagePath = $file->store('public/boutiques');
+                $imagePath = $file->store('boutiques', 'public');
                 $imageUrl = Storage::url($imagePath);
             }
         }
@@ -120,7 +120,7 @@ class BoutiqueController extends Controller
                 $imageUrl = Storage::disk('spaces')->url($imagePath);
             } else {
                 // 📁 Stocker dans storage/app/public/boutiques
-                $imagePath = $request->file('image')->store('public/boutiques');
+                $imagePath = $file->store('boutiques', 'public');
                 $imageUrl = Storage::url($imagePath);
             }
 
