@@ -36,10 +36,12 @@ class ListPublicite extends Component implements HasForms, HasTable
                 TextColumn::make('date_start')
                     ->label('Début')
                     ->searchable()
+                    ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->translatedFormat('d F Y'))
                     ->sortable(),
 
                 TextColumn::make('date_end')
                     ->label('Fin')
+                    ->formatStateUsing(fn ($state) => \Carbon\Carbon::parse($state)->translatedFormat('d F Y'))
                     ->searchable(),
 
                 TextColumn::make('titre')

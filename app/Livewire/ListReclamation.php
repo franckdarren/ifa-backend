@@ -64,7 +64,29 @@ class ListReclamation extends Component implements HasForms, HasTable
             ->filters([
             ])
             ->actions([
+                Action::make('modifier_statut')
+                    ->label('Modifier Statut')
+                    ->icon('heroicon-o-pencil')
+                    ->modalHeading('Modifier le Statut de la Réclamation')
+                    ->form([
+                        Select::make('statut')
+                            ->label('Statut')
+                            ->options([
+                                'En attente de traitement' => 'En attente de traitement',
+                                'En cours' => 'En cours',
+                                'Rejetée' => 'Rejetée',
+                                'Remboursée' => 'Remboursée',
+                            ])
+                            ->required(),
+                    ])
+                    ->action(function (Reclamation $record, array $data) {
+                        $record->update(['statut' => $data['statut']]);
 
+                        Notification::make()
+                            ->title('Statut mis à jour avec succès')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([]);
     }
