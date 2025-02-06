@@ -114,6 +114,7 @@ class BoutiqueController extends Controller
 
         // ✅ Gestion de l'upload d'une nouvelle image
         if ($request->hasFile('url_logo')) {
+            $file = $request->file('url_logo');
             if (env('USE_DIGITALOCEAN_SPACES', false)) {
                 // 🔥 Stocker dans DigitalOcean Spaces
                 $imagePath = $request->file('image')->store('boutiques', 'spaces');

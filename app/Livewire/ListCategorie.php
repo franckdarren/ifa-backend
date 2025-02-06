@@ -42,9 +42,8 @@ class ListCategorie extends Component implements HasForms, HasTable
 
                 ImageColumn::make('url_image')
                     ->label('Image')
-                    ->url(fn($record) => asset( '/storage/'. $record->url_image)) // Prends en compte le chemin relatif
+                    ->url(fn($record) => asset('/storage/' . $record->url_image)) // Prends en compte le chemin relatif
                     ->size(50),
-
 
             ])
             ->headerActions([
