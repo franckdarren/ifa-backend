@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 class UserController extends Controller
 {
@@ -14,7 +17,11 @@ class UserController extends Controller
     public function index()
     {
         //Lister tous les users
-        return response()->json(User::all(), 200);
+        try {
+            return response()->json(User::all(), 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Erreur serveur'], 500);
+        }
     }
 
     /**
@@ -22,24 +29,25 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation des données
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',  // Validation unique sur le champ email
-            'role' => 'required|in:Administrateur,Client,Boutique',  // Exemple de validation pour 'role'
-            'password' => 'required|string|min:6',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'role' => 'required|in:Administrateur,Client,Boutique',
+                'password' => 'required|string|min:6',
+            ]);
 
-        // Création de l'utilisateur
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'role' => $validatedData['role'],
-            'password' => bcrypt($validatedData['password']),
-        ]);
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'role' => $validatedData['role'],
+                'password' => bcrypt($validatedData['password']),
+            ]);
 
-        // Retourner la réponse JSON en masquant le mot de passe
-        return response()->json($user->makeHidden(['password']), 201);
+            return response()->json($user->makeHidden(['password']), 201);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Impossible de créer l\'utilisateur'], 500);
+        }
     }
 
 
@@ -63,26 +71,24 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Mettre à jour un utilisateur existant
-        $user = User::find($id);
+        try {
+            $user = User::findOrFail($id);
+            $validatedData = $request->validate([
+                'name' => 'string|max:255',
+                'password' => 'nullable|string|min:6',
+            ]);
 
-        if (!$user) {
-            return response()->json(['message' => 'Utilisateur non trouvé'], 404);
+            $user->update($validatedData);
+            if ($request->filled('password')) {
+                $user->password = bcrypt($request->password);
+                $user->save();
+            }
+            return response()->json($user, 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Utilisateur non trouvé'], 404);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Erreur serveur'], 500);
         }
-
-        $validatedData = $request->validate([
-            'name' => 'string|max:255',
-            'password' => 'nullable|string|min:6',
-        ]);
-
-        $user->update($validatedData);
-
-        if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
-            $user->save();
-        }
-
-        return response()->json($user, 200);
     }
 
     /**
@@ -90,16 +96,15 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //Supprimer un user
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'Utilisateur non trouvé'], 404);
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+            return response()->json(['message' => 'Utilisateur supprimé avec succès'], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Utilisateur non trouvé'], 404);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Erreur serveur'], 500);
         }
-
-        $user->delete();
-
-        return response()->json(['message' => 'Utilisateur supprimé avec succès'], 200);
     }
 
 
