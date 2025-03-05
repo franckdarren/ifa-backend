@@ -12,12 +12,22 @@ class Article extends Model
         'description',
         'prix',
         'prixPromotion',
-        'quantité',
-        'isDisponible',
+        // 'quantité',
+        // 'isDisponible',
         'isPromotion',
         'pourcentageReduction',
+
         'boutique_id', // Lien avec la boutique de l'article
         'sous_categorie_id', // Lien avec la sous-catégorie de l'article
+
+        'madeInGabon',
+
+        'type',
+        'caracteristiques',
+    ];
+
+    protected $casts = [
+        'caractéristiques' => 'array',
     ];
 
     /**
@@ -41,8 +51,8 @@ class Article extends Model
     public function commandes(): BelongsToMany
     {
         return $this->belongsToMany(Commande::class, 'article_commandes')
-                    ->withPivot('quantite', 'prix', 'reduction')
-                    ->withTimestamps();
+            ->withPivot('quantite', 'prix', 'reduction')
+            ->withTimestamps();
     }
 
     public function images()

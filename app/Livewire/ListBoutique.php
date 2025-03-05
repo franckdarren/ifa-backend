@@ -33,7 +33,7 @@ class ListBoutique extends Component implements HasForms, HasTable
             ->columns([
                 ImageColumn::make('url_logo')
                     ->label('Logo')
-                    ->url(fn($record) => asset( $record->url_logo)) // Prends en compte le chemin relatif
+                    ->url(fn($record) => asset($record->url_logo)) // Prends en compte le chemin relatif
                     ->size(50),
 
                 TextColumn::make('nom')
@@ -49,14 +49,20 @@ class ListBoutique extends Component implements HasForms, HasTable
                     ->label('Phone')
                     ->searchable(),
 
+                TextColumn::make('is_active')
+                    ->label('Actif ?')
+                    ->searchable(),
+
+                TextColumn::make('solde')
+                    ->label('Solde')
+                    ->searchable(),
+
                 TextColumn::make('heure_ouverture')
                     ->label('Heure ouverture')
-                    ->time('H:i')
                     ->searchable(),
 
                 TextColumn::make('heure_fermeture')
                     ->label('Heure fermeture')
-                    ->time('H:i')
                     ->searchable(),
 
                 TextColumn::make('description')

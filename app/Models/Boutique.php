@@ -15,6 +15,11 @@ class Boutique extends Model
         'heure_fermeture',
         'description',
         'user_id', // Lien avec l'utilisateur propriétaire de la boutique
+
+        'is_active',
+        'solde',
+        // 'trial_ends_at',
+        // 'next_payment_date',
     ];
 
     /**

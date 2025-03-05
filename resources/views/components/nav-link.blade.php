@@ -6,7 +6,7 @@
         : 'flex items-center px-2 mx-4 py-2 mt-4 text-gray-100 hover:bg-[#4996d1] hover:rounded-md hover:bg-opacity-35 hover:text-gray-100';
 @endphp
 
-<a {{ $attributes->merge(['class' => $classes]) }}>
+<a {{ $attributes->merge(['class' => $classes]) }} wire:navigate>
     @if ($icone)
         {!! $icone !!}
     @endif

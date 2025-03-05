@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use App\Models\Boutique;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -22,6 +24,9 @@ Route::get('/user', function (Request $request) {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/users', [UserController::class, 'store']);  // Créer un nouvel utilisateur
 
+// Login with firebase
+Route::post('/firebase-login', [AuthController::class, 'firebaseLogin']);
+
 Route::middleware('auth:sanctum')->group(function () {
     // Actions utilisateurs
     Route::get('/users', [UserController::class, 'index']);   // Liste tous les utilisateurs
@@ -33,6 +38,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/{id}/commandes', [UserController::class, 'commandes']); // Liste les commandes
     Route::get('/users/{id}/livraisons', [UserController::class, 'livraisons']); // Liste les livraisons
     Route::get('/users/{id}/reclamations', [UserController::class, 'reclamations']); // Liste les reclamations
+
+    Route::get('/check-shop/{userId}', function ($userId) {
+        $hasShop = Boutique::where('user_id', $userId)->exists();
+        return response()->json(['hasShop' => $hasShop]);
+    });
 
     // Gestion Publicités
     Route::prefix('publicites')->group(function () {
@@ -81,6 +91,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/articles/{id}', [ArticleController::class, 'show']);
     Route::put('/articles/{id}', [ArticleController::class, 'update']);
     Route::delete('/articles/{id}', [ArticleController::class, 'destroy']);
+    Route::get('form-schema', [ArticleController::class, 'getSchema']);
+    Route::get('articles-disponibles', [ArticleController::class, 'articlesDisponibles']);
+
 
     // Gestion des article_commandes
     Route::post('/commandes/{commande_id}/articles', [ArticleCommandeController::class, 'attachArticle']);

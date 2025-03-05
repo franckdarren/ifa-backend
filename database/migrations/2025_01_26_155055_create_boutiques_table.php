@@ -16,9 +16,14 @@ return new class extends Migration {
             $table->string('nom');
             $table->string('phone');
             $table->string('url_logo');
-            $table->time('heure_ouverture');
-            $table->time('heure_fermeture');
+            $table->string('heure_ouverture');
+            $table->string('heure_fermeture');
             $table->string('description');
+
+            $table->boolean('is_active')->default(true);
+            $table->integer('solde')->default(0);
+            // $table->timestamp('trial_ends_at')->nullable();
+            // $table->timestamp('next_payment_date')->nullable();
 
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
 
