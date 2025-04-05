@@ -26,29 +26,52 @@ class ArticleController extends Controller
             'nom' => 'required|string',
             'description' => 'required|string',
             'prix' => 'required|integer',
-            'prixPromotion' => 'nullable|integer',
-            'type' => 'required|string',
-            'caracteristiques' => 'required|array',
+            'prix_promotion' => 'nullable|integer',
+            'is_promotion' => 'boolean',
             'boutique_id' => 'required|exists:boutiques,id',
             'sous_categorie_id' => 'required|exists:sous_categories,id',
+            'is_made_in_gabon' => 'boolean',
+            'type' => 'required|string',
+            'variations' => 'required|array',
+            'variations.*.couleur' => 'required|string',
+            'variations.*.code_couleur' => 'required|string',
+            'variations.*.taille' => 'required|integer',
+            'variations.*.quantite' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data = $request->all();
+        // Création de l'article
+        $article = Article::create($request->only([
+            'nom',
+            'description',
+            'prix',
+            'prix_promotion',
+            'is_promotion',
+            'pourcentageReduction',
+            'madeInGabon',
+            'boutique_id',
+            'sous_categorie_id',
+        ]));
 
-        // Calculer le pourcentage de réduction si prixPromotion est présent
-        if (!empty($data['prixPromotion']) && $data['prix'] > 0) {
-            $data['pourcentageReduction'] = (1 - ($data['prixPromotion'] / $data['prix'])) * 100;
-        } else {
-            $data['pourcentageReduction'] = 0; // Pas de réduction
+        // Ajout des variations
+        foreach ($request->variations as $variationData) {
+            $variation = $article->variations()->create([
+                'couleur' => $variationData['couleur'],
+                'code_couleur' => $variationData['code_couleur'],
+                'taille' => $variationData['taille'],
+            ]);
+
+            // Ajout du stock
+            $variation->stock()->create([
+                'quantite' => $variationData['quantite'],
+            ]);
         }
 
-        $article = Article::create($data);
+        return response()->json($article->load('variations.stock'), 201);
 
-        return response()->json($article, 201);
     }
 
 
@@ -110,23 +133,13 @@ class ArticleController extends Controller
         return response()->json(['message' => 'Article supprimé avec succès'], 200);
     }
 
-    // Récupérer le schéma du formulaire
-    public function getSchema(Request $request)
-    {
-        $type = $request->query('type'); // Récupère le paramètre "type"
-
-        $schemas = config('formSchemas'); // Charge le fichier config/formSchemas.php
-        $schema = $schemas[$type] ?? []; // Utilise la clé correspondant au type ou un tableau vide si introuvable
-
-        return response()->json(['fields' => $schema]);
-    }
-
-
     // Récupérer les articles d'une boutique
     public function articlesBoutique(string $id)
     {
         return response()->json(
-            Article::where('boutique_id', $id)->get(),
+            Article::where('boutique_id', $id)
+                ->with(['variations.stocks', 'boutique', 'sousCategorie', 'images', 'variations.images'])
+                ->get(),
             200
         );
     }
@@ -134,8 +147,11 @@ class ArticleController extends Controller
     // Récupérer les articles disponibles
     public function articlesDisponibles(string $id)
     {
-        $articles = Article::whereRaw("JSON_UNQUOTE(JSON_EXTRACT(caracteristiques, '$.quantite')) >= 1")->get();
+        $articles = Article::whereHas('variations.stocks', function ($query) {
+            $query->where('quantite', '>=', 1);
+        })->get();
 
         return response()->json($articles);
     }
+
 }

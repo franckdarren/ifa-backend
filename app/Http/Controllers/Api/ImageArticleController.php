@@ -24,8 +24,8 @@ class ImageArticleController extends Controller
     {
         // Validation des données
         $validator = Validator::make($request->all(), [
-            'couleur' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // ✅ L'image est requise ici
+            'variation_id' => 'integer',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif', // ✅ L'image est requise ici
         ]);
 
         if ($validator->fails()) {
@@ -56,7 +56,7 @@ class ImageArticleController extends Controller
         // ✅ Création de l'image de l'article
         $image = ImageArticle::create([
             'article_id' => $articleId,
-            'couleur' => $request->couleur,
+            'variation_id' => $request->variation_id,
             'url_photo' => $imageUrl,
         ]);
 
@@ -89,7 +89,7 @@ class ImageArticleController extends Controller
         $validator = Validator::make($request->all(), [
             'nom' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image optionnelle
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif', // Image optionnelle
         ]);
 
         if ($validator->fails()) {

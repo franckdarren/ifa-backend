@@ -10,13 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('image_articles', function (Blueprint $table) {
+        Schema::create('variations', function (Blueprint $table) {
             $table->id();
-            $table->string('url_photo');
-            $table->foreignId('variation_id')->nullable()->constrained('variations')->onDelete('cascade');
-
-            $table->foreignId('article_id')->constrained('articles')->onDelete('cascade');
-
+            $table->foreignId('article_id')->constrained()->onDelete('cascade');
+            $table->string('couleur');
+            $table->string('code_couleur');
+            $table->string('taille');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('image_articles');
+        Schema::dropIfExists('variations');
     }
 };

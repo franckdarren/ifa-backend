@@ -12,23 +12,25 @@ class Article extends Model
         'description',
         'prix',
         'prixPromotion',
-        // 'quantité',
-        // 'isDisponible',
+
         'isPromotion',
         'pourcentageReduction',
 
-        'boutique_id', // Lien avec la boutique de l'article
-        'sous_categorie_id', // Lien avec la sous-catégorie de l'article
+        'boutique_id',
+        'sous_categorie_id',
 
         'madeInGabon',
 
-        'type',
-        'caracteristiques',
     ];
 
     protected $casts = [
-        'caractéristiques' => 'array',
+
     ];
+
+    public function variations()
+    {
+        return $this->hasMany(Variation::class);
+    }
 
     /**
      * Relation avec le modèle `Boutique`.
@@ -57,7 +59,7 @@ class Article extends Model
 
     public function images()
     {
-        return $this->hasMany(ImageArticle::class);
+        return $this->hasMany(ImageArticle::class)->whereNull('variation_id'); // Récupère uniquement les images générales;
     }
 
 }

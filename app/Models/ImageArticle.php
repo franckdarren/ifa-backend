@@ -8,7 +8,7 @@ class ImageArticle extends Model
 {
     protected $fillable = [
         'url_photo',
-        'couleur',
+        'variation_id',
         'article_id', // Lien avec l'article
     ];
 
@@ -19,5 +19,10 @@ class ImageArticle extends Model
     public function article()
     {
         return $this->belongsTo(Article::class);
+    }
+
+    public function variation()
+    {
+        return $this->belongsTo(Variation::class);
     }
 }
