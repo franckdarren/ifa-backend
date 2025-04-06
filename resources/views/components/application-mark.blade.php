@@ -1,1 +1,1 @@
-<img src="/logo.png" alt="logo" class="h-[100px]">
+<img src="/logo2.png" alt="logo" class="h-[100px]">
