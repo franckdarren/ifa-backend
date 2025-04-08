@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\BoutiqueController;
 use App\Http\Controllers\Api\CommandeController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\ReclamationController;
 use App\Http\Controllers\Api\ImageArticleController;
 use App\Http\Controllers\Api\SousCategorieController;
 use App\Http\Controllers\Api\ArticleCommandeController;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -123,5 +125,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('reclamations', [ReclamationController::class, 'store']);
     Route::put('reclamations/{id}', [ReclamationController::class, 'update']);
     Route::delete('reclamations/{id}', [ReclamationController::class, 'destroy']);
+
+    // Reports
+    Route::get('dashboard/stats', [ReportController::class, 'dashboardStats']);
 
 });
