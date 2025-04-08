@@ -66,4 +66,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function boutique()
+    {
+        return $this->hasOne(Boutique::class);
+    }
 }
