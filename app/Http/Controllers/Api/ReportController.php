@@ -2,26 +2,39 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ReportController extends Controller
 {
-    public function dashboardStats(Request $request)
+    public function dashboardStats($userId)
     {
-        // Récupère l'utilisateur connecté
-        $user = $request->user();
+        // Récupère l'utilisateur par son ID
+        $user = User::with('boutique')->find($userId);
 
-        // Récupère la boutique de l'utilisateur
+        if (!$user) {
+            return response()->json([
+                'error' => 'Utilisateur non trouvé.'
+            ], 404);
+        }
+
         $boutique = $user->boutique;
 
-        // Récupère le nombre d'articles, de ventes et d'alertes
+        if (!$boutique) {
+            return response()->json([
+                'error' => 'Aucune boutique associée à cet utilisateur.'
+            ], 404);
+        }
+
         return response()->json([
-            'articles_count' => $boutique->articles()->count(),  // Nombre d'articles
-            'ventes_count' => $boutique->ventes()->count(),      // Nombre de ventes
-            'alertes_count' => $boutique->alertes()->count(),    // Nombre d'alertes (ajouté ici)
+            'articles_count' => $boutique->articles()->count(),
+            // 'ventes_count' => $boutique->ventes()->count(),
+            // 'alertes_count' => $boutique->alertes()->count(),
         ]);
     }
+
+
 
 
 }
