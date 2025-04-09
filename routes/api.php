@@ -127,6 +127,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('reclamations/{id}', [ReclamationController::class, 'destroy']);
 
     // Reports
-    Route::get('dashboard/stats', [ReportController::class, 'dashboardStats']);
+    Route::get('dashboard/stats/{userId}', [ReportController::class, 'dashboardStats']);
 
 });
