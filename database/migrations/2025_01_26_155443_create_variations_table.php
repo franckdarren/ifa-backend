@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('article_id')->constrained()->onDelete('cascade');
             $table->string('couleur');
-            $table->string('code_couleur');
+            // $table->string('code_couleur');
             $table->string('taille');
             $table->timestamps();
         });

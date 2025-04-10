@@ -34,7 +34,7 @@ class ArticleController extends Controller
             'type' => 'required|string',
             'variations' => 'required|array',
             'variations.*.couleur' => 'required|string',
-            'variations.*.code_couleur' => 'required|string',
+            // 'variations.*.code_couleur' => 'required|string',
             'variations.*.taille' => 'required|integer',
             'variations.*.quantite' => 'required|integer',
             'images' => 'nullable|array', // Si vous voulez ajouter des images pour l'article principal
@@ -68,7 +68,7 @@ class ArticleController extends Controller
         foreach ($request->variations as $variationData) {
             $variation = $article->variations()->create([
                 'couleur' => $variationData['couleur'],
-                'code_couleur' => $variationData['code_couleur'],
+                // 'code_couleur' => $variationData['code_couleur'],
                 'taille' => $variationData['taille'],
             ]);
 
