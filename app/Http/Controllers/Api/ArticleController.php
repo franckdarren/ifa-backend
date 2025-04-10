@@ -37,6 +37,8 @@ class ArticleController extends Controller
             'variations.*.code_couleur' => 'required|string',
             'variations.*.taille' => 'required|integer',
             'variations.*.quantite' => 'required|integer',
+            'images' => 'nullable|array', // Si vous voulez ajouter des images pour l'article principal
+            'images.*' => 'image|mimes:jpg,jpeg,png,gif|max:2048', // Validation d'image
         ]);
 
         if ($validator->fails()) {
@@ -50,11 +52,17 @@ class ArticleController extends Controller
             'prix',
             'prix_promotion',
             'is_promotion',
-            'pourcentageReduction',
-            'madeInGabon',
             'boutique_id',
             'sous_categorie_id',
         ]));
+
+        // Ajout des images de l'article principal
+        if ($request->has('images')) {
+            foreach ($request->images as $imageFile) {
+                $path = $imageFile->store('images/articles'); // Stocke les images
+                $article->images()->create(['url' => $path]); // Crée une entrée pour l'image dans la base de données
+            }
+        }
 
         // Ajout des variations
         foreach ($request->variations as $variationData) {
@@ -68,11 +76,19 @@ class ArticleController extends Controller
             $variation->stock()->create([
                 'quantite' => $variationData['quantite'],
             ]);
+
+            // Ajout des images de la variation
+            if (isset($variationData['images'])) {
+                foreach ($variationData['images'] as $imageFile) {
+                    $path = $imageFile->store('images/variations');
+                    $variation->images()->create(['url' => $path]);
+                }
+            }
         }
 
-        return response()->json($article->load('variations.stock'), 201);
-
+        return response()->json($article->load('variations.stock', 'images', 'variations.images'), 201);
     }
+
 
 
     /**
@@ -80,12 +96,15 @@ class ArticleController extends Controller
      */
     public function show(string $id)
     {
-        $article = Article::with('images')->find($id);
+        $article = Article::with(['images', 'variations.images'])->find($id);
+
         if (!$article) {
             return response()->json(['message' => 'Article non trouvé'], 404);
         }
+
         return response()->json($article, 200);
     }
+
 
     /**
      * Update the specified resource in storage.
