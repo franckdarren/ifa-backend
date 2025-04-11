@@ -40,9 +40,9 @@ class ArticleController extends Controller
             // 'type' => 'required|string',
             'variations' => 'required|array',
             'variations.*.couleur' => 'required|string',
-            'variations.*.taille' => 'required|integer',
+            'variations.*.taille' => 'required|string',
             'variations.*.quantite' => 'required|integer',
-            'images' => 'nullable|array', // Si vous voulez ajouter des images pour l'article principal
+            'images' => 'nullable|array', // Images de l'article principal
             'images.*' => 'image|mimes:jpg,jpeg,png,gif|max:2048', // Validation d'image
         ]);
 
@@ -61,11 +61,11 @@ class ArticleController extends Controller
             'categorie_id',
         ]));
 
-        // Ajout des images de l'article principal
+        // Ajout des images de l'article principal en utilisant 'url_photo'
         if ($request->has('images')) {
             foreach ($request->images as $imageFile) {
-                $path = $imageFile->store('images/articles'); // Stocke les images
-                $article->images()->create(['url' => $path]); // Crée une entrée pour l'image dans la base de données
+                $path = $imageFile->store('images/articles');
+                $article->images()->create(['url_photo' => $path]);
             }
         }
 
@@ -73,26 +73,26 @@ class ArticleController extends Controller
         foreach ($request->variations as $variationData) {
             $variation = $article->variations()->create([
                 'couleur' => $variationData['couleur'],
-                // 'code_couleur' => $variationData['code_couleur'],
                 'taille' => $variationData['taille'],
             ]);
 
-            // Ajout du stock
+            // Ajout du stock pour la variation
             $variation->stock()->create([
                 'quantite' => $variationData['quantite'],
             ]);
 
-            // Ajout des images de la variation
+            // Ajout des images pour la variation en utilisant 'url_photo'
             if (isset($variationData['images'])) {
                 foreach ($variationData['images'] as $imageFile) {
                     $path = $imageFile->store('images/variations');
-                    $variation->images()->create(['url' => $path]);
+                    $variation->images()->create(['url_photo' => $path]);
                 }
             }
         }
 
         return response()->json($article->load('variations.stock', 'images', 'variations.images'), 201);
     }
+
 
 
 
