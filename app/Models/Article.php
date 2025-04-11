@@ -41,15 +41,6 @@ class Article extends Model
         return $this->belongsTo(Boutique::class);
     }
 
-    /**
-     * Relation avec le modèle `SousCategorie`.
-     * Un article appartient à une sous-catégorie.
-     */
-    public function sousCategorie()
-    {
-        return $this->belongsTo(Categorie::class);
-    }
-
     public function commandes(): BelongsToMany
     {
         return $this->belongsToMany(Commande::class, 'article_commandes')

@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->boolean('madeInGabon')->default(false);
 
             $table->foreignId('boutique_id')->constrained('boutiques')->onDelete('cascade');
-            $table->foreignId('categorie_id')->constrained('categories')->onDelete('cascade');
+            $table->string('categorie');
 
 
             $table->timestamps();
