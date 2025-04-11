@@ -29,7 +29,7 @@ class ArticleController extends Controller
             'prix_promotion' => 'nullable|integer',
             'is_promotion' => 'boolean',
             'boutique_id' => 'required|exists:boutiques,id',
-            'sous_categorie_id' => 'required|exists:sous_categories,id',
+            'categorie_id' => 'required|exists:categories,id',
             'is_made_in_gabon' => 'boolean',
             'type' => 'required|string',
             'variations' => 'required|array',
@@ -52,7 +52,7 @@ class ArticleController extends Controller
             'prix_promotion',
             'is_promotion',
             'boutique_id',
-            'sous_categorie_id',
+            'categorie_id',
         ]));
 
         // Ajout des images de l'article principal
