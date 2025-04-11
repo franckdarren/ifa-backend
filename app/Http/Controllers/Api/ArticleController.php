@@ -22,6 +22,12 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
+        // Transformation des champs is_promotion et is_made_in_gabon en booléens
+        $request->merge([
+            'is_promotion' => filter_var($request->input('is_promotion'), FILTER_VALIDATE_BOOLEAN),
+            'is_made_in_gabon' => filter_var($request->input('is_made_in_gabon'), FILTER_VALIDATE_BOOLEAN),
+        ]);
+
         $validator = Validator::make($request->all(), [
             'nom' => 'required|string',
             'description' => 'required|string',
