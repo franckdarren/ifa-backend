@@ -12,8 +12,8 @@ class Categorie extends Model
         'url_image',
     ];
 
-    public function sousCategories()
+    public function articles()
     {
-        return $this->hasMany(SousCategorie::class);
+        return $this->hasMany(Article::class);
     }
 }

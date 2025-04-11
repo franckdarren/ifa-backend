@@ -64,15 +64,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{id}', [CategorieController::class, 'destroy']); // Supprimer une catégorie
     });
 
-    // Gestion des Sous Catégories (uniquement admin)
-    Route::prefix('sous-categories')->group(function () {
-        Route::get('/', [SousCategorieController::class, 'index']); // Récupérer toutes les sous-catégories
-        Route::get('{id}', [SousCategorieController::class, 'show']); // Récupérer une sous-catégorie par ID
-        Route::post('/', [SousCategorieController::class, 'store']); // Créer une nouvelle sous-catégorie
-        Route::put('{id}', [SousCategorieController::class, 'update']); // Mettre à jour une sous-catégorie
-        Route::delete('{id}', [SousCategorieController::class, 'destroy']); // Supprimer une sous-catégorie
-    });
-
     // Gestion boutiques
     Route::get('/boutiques', [BoutiqueController::class, 'index']);
     Route::post('/boutiques', [BoutiqueController::class, 'store']);

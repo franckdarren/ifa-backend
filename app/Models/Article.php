@@ -47,7 +47,7 @@ class Article extends Model
      */
     public function sousCategorie()
     {
-        return $this->belongsTo(SousCategorie::class);
+        return $this->belongsTo(Categorie::class);
     }
 
     public function commandes(): BelongsToMany
