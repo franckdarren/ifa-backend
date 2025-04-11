@@ -31,7 +31,7 @@ class ArticleController extends Controller
             'boutique_id' => 'required|exists:boutiques,id',
             'categorie_id' => 'required|exists:categories,id',
             'is_made_in_gabon' => 'boolean',
-            'type' => 'required|string',
+            // 'type' => 'required|string',
             'variations' => 'required|array',
             'variations.*.couleur' => 'required|string',
             'variations.*.taille' => 'required|integer',
