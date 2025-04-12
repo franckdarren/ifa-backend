@@ -30,6 +30,11 @@ class ListArticle extends Component implements HasForms, HasTable
             ->query(Article::query()->orderBy('created_at', 'desc'))
             // ->paginated(false)
             ->columns([
+                TextColumn::make('id')
+                    ->label('ID')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('nom')
                     ->label('Nom')
                     ->searchable()
