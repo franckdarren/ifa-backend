@@ -17,7 +17,7 @@ class Article extends Model
         'pourcentageReduction',
 
         'boutique_id',
-        'sous_categorie_id',
+        'categorie',
 
         'madeInGabon',
 
