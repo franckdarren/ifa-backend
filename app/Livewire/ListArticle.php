@@ -44,14 +44,14 @@ class ListArticle extends Component implements HasForms, HasTable
                     ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
                     ->searchable(),
 
-                TextColumn::make('quantité')
-                    ->label('Quantité')
-                    ->searchable(),
+                // TextColumn::make('quantité')
+                //     ->label('Quantité')
+                //     ->searchable(),
 
-                TextColumn::make('isDisponible')
-                    ->label('Disponible')
-                    ->formatStateUsing(fn($state) => $state ? 'Oui' : 'Non')
-                    ->searchable(),
+                // TextColumn::make('isDisponible')
+                //     ->label('Disponible')
+                //     ->formatStateUsing(fn($state) => $state ? 'Oui' : 'Non')
+                //     ->searchable(),
 
                 TextColumn::make('isPromotion')
                     ->label('En promotion')
