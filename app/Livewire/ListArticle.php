@@ -67,16 +67,12 @@ class ListArticle extends Component implements HasForms, HasTable
                     ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
                     ->searchable(),
 
+                TextColumn::make('categorie')
+                    ->label('Catégorie')
+                    ->searchable(),
+
                 TextColumn::make('boutique.nom')
                     ->label('Boutique')
-                    ->searchable(),
-
-                TextColumn::make('sousCategorie.nom')
-                    ->label('Sous catégorie')
-                    ->searchable(),
-
-                TextColumn::make('sousCategorie.categorie.nom')
-                    ->label('Catégorie')
                     ->searchable(),
 
                 ImageColumn::make('images.url_photo')
