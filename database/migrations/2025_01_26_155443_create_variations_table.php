@@ -14,8 +14,9 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('article_id')->constrained()->onDelete('cascade');
             $table->string('couleur');
-            // $table->string('code_couleur');
             $table->string('taille');
+            $table->integer('stock')->default(0);  // Stock pour chaque variation
+            $table->integer('prix')->nullable();
             $table->timestamps();
         });
     }

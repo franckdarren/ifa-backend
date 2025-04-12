@@ -22,76 +22,44 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        // Transformation des champs is_promotion et is_made_in_gabon en booléens
-        $request->merge([
-            'is_promotion' => filter_var($request->input('is_promotion'), FILTER_VALIDATE_BOOLEAN),
-            'is_made_in_gabon' => filter_var($request->input('is_made_in_gabon'), FILTER_VALIDATE_BOOLEAN),
-        ]);
-
-        $validator = Validator::make($request->all(), [
-            'nom' => 'required|string',
-            'description' => 'required|string',
+        // Validation des données
+        $request->validate([
+            'nom' => 'required|string|max:255',
             'prix' => 'required|integer',
-            'prix_promotion' => 'nullable|integer',
-            'is_promotion' => 'boolean',
-            'boutique_id' => 'required|exists:boutiques,id',
-            'is_made_in_gabon' => 'boolean',
             'categorie' => 'required|string',
-
-            'variations' => 'required|array',
+            'variations' => 'required|array',  // Assurer qu'il y a des variations
             'variations.*.couleur' => 'required|string',
             'variations.*.taille' => 'required|string',
-            'variations.*.quantite' => 'required|integer',
-            'images' => 'nullable|array', // Images de l'article principal
-            'images.*' => 'image|mimes:jpg,jpeg,png,gif|max:2048', // Validation d'image
+            'variations.*.stock' => 'required|integer',  // Validation pour le stock
+            'variations.*.prix' => 'nullable|integer',   // Validation pour le prix, il est nullable
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         // Création de l'article
-        $article = Article::create($request->only([
-            'nom',
-            'description',
-            'prix',
-            'prix_promotion',
-            'is_promotion',
-            'boutique_id',
-            'categorie_id',
-        ]));
+        $article = Article::create([
+            'nom' => $request->nom,
+            'description' => $request->description,
+            'prix' => $request->prix,
+            'prixPromotion' => $request->prixPromotion,
+            'isPromotion' => $request->isPromotion,
+            'pourcentageReduction' => $request->pourcentageReduction,
+            'madeInGabon' => $request->madeInGabon,
+            'boutique_id' => $request->boutique_id,
+            'categorie' => $request->categorie,
+        ]);
 
-        // Ajout des images de l'article principal en utilisant 'url_photo'
-        if ($request->has('images')) {
-            foreach ($request->images as $imageFile) {
-                $path = $imageFile->store('images/articles');
-                $article->images()->create(['url_photo' => $path]);
-            }
+        // Création des variations pour cet article
+        foreach ($request->variations as $variation) {
+            $article->variations()->create([
+                'couleur' => $variation['couleur'],
+                'taille' => $variation['taille'],
+                'stock' => $variation['stock'],  // Enregistrer le stock
+                'prix' => $variation['prix'] ?? null,  // Enregistrer le prix, ou null si non spécifié
+            ]);
         }
 
-        // Ajout des variations
-        foreach ($request->variations as $variationData) {
-            $variation = $article->variations()->create([
-                'couleur' => $variationData['couleur'],
-                'taille' => $variationData['taille'],
-            ]);
-
-            // Ajout du stock pour la variation
-            $variation->stock()->create([
-                'quantite' => $variationData['quantite'],
-            ]);
-
-            // Ajout des images pour la variation en utilisant 'url_photo'
-            if (isset($variationData['images'])) {
-                foreach ($variationData['images'] as $imageFile) {
-                    $path = $imageFile->store('images/variations');
-                    $variation->images()->create(['url_photo' => $path]);
-                }
-            }
-        }
-
-        return response()->json($article->load('variations.stock', 'images', 'variations.images'), 201);
+        return response()->json($article, 201);
     }
+
 
 
 
@@ -172,7 +140,7 @@ class ArticleController extends Controller
     public function articlesDisponibles(string $id)
     {
         $articles = Article::whereHas('variations.stocks', function ($query) {
-            $query->where('quantite', '>=', 1);
+            $query->where('stock', '>=', 1);
         })->get();
 
         return response()->json($articles);
