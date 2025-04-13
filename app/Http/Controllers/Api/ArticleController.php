@@ -15,7 +15,8 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return response()->json(Article::all(), 200);
+        $articles = Article::with(['images', 'variations'])->get();
+        return response()->json($articles);
     }
 
     /**
