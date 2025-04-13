@@ -24,8 +24,10 @@ class Article extends Model
     ];
 
     protected $casts = [
-
+        'isPromotion' => 'boolean',
+        'madeInGabon' => 'boolean',
     ];
+
 
     public function variations()
     {

@@ -38,14 +38,17 @@ class ArticleController extends Controller
             'variations_images.*.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        $isPromotion = filter_var($request->isPromotion, FILTER_VALIDATE_BOOLEAN);
+        $madeInGabon = filter_var($request->madeInGabon, FILTER_VALIDATE_BOOLEAN);
+
         $article = Article::create([
             'nom' => $request->nom,
             'description' => $request->description,
             'prix' => $request->prix,
             'prixPromotion' => $request->prixPromotion,
-            'isPromotion' => $request->isPromotion,
+            'isPromotion' => $isPromotion,
             'pourcentageReduction' => $request->pourcentageReduction,
-            'madeInGabon' => $request->madeInGabon,
+            'madeInGabon' => $madeInGabon,
             'boutique_id' => $request->boutique_id,
             'categorie' => $request->categorie,
         ]);
@@ -81,6 +84,7 @@ class ArticleController extends Controller
         }
 
         return response()->json($article->load('variations', 'images'), 201);
+
     }
 
 
