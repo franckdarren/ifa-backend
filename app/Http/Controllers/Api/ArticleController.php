@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Article;
+use App\Models\ImageArticle;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -22,19 +23,21 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        // Validation des données
         $request->validate([
             'nom' => 'required|string|max:255',
             'prix' => 'required|integer',
             'categorie' => 'required|string',
-            'variations' => 'required|array',  // Assurer qu'il y a des variations
+            'boutique_id' => 'required|integer',
+            'variations' => 'required|array',
             'variations.*.couleur' => 'required|string',
             'variations.*.taille' => 'required|string',
-            'variations.*.stock' => 'required|integer',  // Validation pour le stock
-            'variations.*.prix' => 'nullable|integer',   // Validation pour le prix, il est nullable
+            'variations.*.stock' => 'required|integer',
+            'variations.*.prix' => 'nullable|integer',
+            'article_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'variations_images' => 'nullable|array',
+            'variations_images.*.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Création de l'article
         $article = Article::create([
             'nom' => $request->nom,
             'description' => $request->description,
@@ -47,19 +50,38 @@ class ArticleController extends Controller
             'categorie' => $request->categorie,
         ]);
 
-        // Création des variations pour cet article
-        foreach ($request->variations as $variation) {
-            $article->variations()->create([
-                'couleur' => $variation['couleur'],
-                'taille' => $variation['taille'],
-                'stock' => $variation['stock'],  // Enregistrer le stock
-                'prix' => $variation['prix'] ?? null,  // Enregistrer le prix, ou null si non spécifié
-            ]);
+        // Enregistrer les images principales de l'article
+        if ($request->hasFile('article_images')) {
+            foreach ($request->file('article_images') as $image) {
+                $path = $image->store('articles', 'public');
+                $article->images()->create([
+                    'url_photo' => $path
+                ]);
+            }
         }
 
-        return response()->json($article, 201);
-    }
+        // Créer les variations avec images
+        foreach ($request->variations as $index => $variationData) {
+            $variation = $article->variations()->create([
+                'couleur' => $variationData['couleur'],
+                'taille' => $variationData['taille'],
+                'stock' => $variationData['stock'],
+                'prix' => $variationData['prix'] ?? null,
+            ]);
 
+            if ($request->hasFile("variations_images.$index")) {
+                foreach ($request->file("variations_images.$index") as $image) {
+                    $path = $image->store('variations', 'public');
+                    $variation->images()->create([
+                        'url_photo' => $path,
+                        'article_id' => $article->id,
+                    ]);
+                }
+            }
+        }
+
+        return response()->json($article->load('variations', 'images'), 201);
+    }
 
 
 
