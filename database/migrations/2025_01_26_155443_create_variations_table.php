@@ -13,8 +13,8 @@ return new class extends Migration {
         Schema::create('variations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('article_id')->constrained()->onDelete('cascade');
-            $table->string('couleur');
-            $table->string('taille');
+            $table->string('couleur')->nullable();
+            $table->string('taille')->nullable();
             $table->integer('stock')->default(0);  // Stock pour chaque variation
             $table->integer('prix')->nullable();
             $table->timestamps();

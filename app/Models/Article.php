@@ -20,6 +20,7 @@ class Article extends Model
         'categorie',
 
         'madeInGabon',
+        'image_principale',
 
     ];
 

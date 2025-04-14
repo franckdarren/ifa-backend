@@ -29,19 +29,32 @@ class ArticleController extends Controller
             'prix' => 'required|integer',
             'categorie' => 'required|string',
             'boutique_id' => 'required|integer',
+
+            // Image principale
+            'image_principale' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+
+            // Galerie d'images
+            'article_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+
+            // Variations
             'variations' => 'required|array',
             'variations.*.couleur' => 'required|string',
             'variations.*.taille' => 'required|string',
             'variations.*.stock' => 'required|integer',
             'variations.*.prix' => 'nullable|integer',
-            'article_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'variations_images' => 'nullable|array',
-            'variations_images.*.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'variations.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $isPromotion = filter_var($request->isPromotion, FILTER_VALIDATE_BOOLEAN);
         $madeInGabon = filter_var($request->madeInGabon, FILTER_VALIDATE_BOOLEAN);
 
+        // Stocker l'image principale
+        $imagePrincipalePath = null;
+        if ($request->hasFile('image_principale')) {
+            $imagePrincipalePath = $request->file('image_principale')->store('articles', 'public');
+        }
+
+        // Création de l'article
         $article = Article::create([
             'nom' => $request->nom,
             'description' => $request->description,
@@ -52,9 +65,10 @@ class ArticleController extends Controller
             'madeInGabon' => $madeInGabon,
             'boutique_id' => $request->boutique_id,
             'categorie' => $request->categorie,
+            'image_principale' => $imagePrincipalePath,
         ]);
 
-        // Enregistrer les images principales de l'article
+        // Galerie d’images supplémentaires
         if ($request->hasFile('article_images')) {
             foreach ($request->file('article_images') as $image) {
                 $path = $image->store('articles', 'public');
@@ -64,29 +78,27 @@ class ArticleController extends Controller
             }
         }
 
-        // Créer les variations avec images
-        foreach ($request->variations as $index => $variationData) {
-            $variation = $article->variations()->create([
+        // Création des variations
+        foreach ($request->variations as $variationData) {
+            $variationImagePath = null;
+
+            // Gérer l'image de la variation (si envoyée)
+            if (isset($variationData['image']) && $variationData['image'] instanceof \Illuminate\Http\UploadedFile) {
+                $variationImagePath = $variationData['image']->store('variations', 'public');
+            }
+
+            $article->variations()->create([
                 'couleur' => $variationData['couleur'],
                 'taille' => $variationData['taille'],
                 'stock' => $variationData['stock'],
                 'prix' => $variationData['prix'] ?? null,
+                'image' => $variationImagePath,
             ]);
-
-            if ($request->hasFile("variations_images.$index")) {
-                foreach ($request->file("variations_images.$index") as $image) {
-                    $path = $image->store('variations', 'public');
-                    $variation->images()->create([
-                        'url_photo' => $path,
-                        'article_id' => $article->id,
-                    ]);
-                }
-            }
         }
 
         return response()->json($article->load('variations', 'images'), 201);
-
     }
+
 
 
 

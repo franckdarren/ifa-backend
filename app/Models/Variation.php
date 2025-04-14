@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Variation extends Model
 {
-    protected $fillable = ['article_id', 'couleur', 'taille'];
+    protected $fillable = ['article_id', 'couleur', 'taille', 'prix', 'stock', 'image'];
 
     public function article()
     {
