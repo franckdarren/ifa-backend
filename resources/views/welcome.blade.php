@@ -1210,7 +1210,7 @@
     @endif
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4 py-8">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
     <div class="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-2xl text-center">
         <div class="flex justify-center mb-5">
             <img src="/logo.png" alt="logo" class="h-[200px]">
