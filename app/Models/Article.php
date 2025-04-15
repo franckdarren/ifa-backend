@@ -12,13 +12,10 @@ class Article extends Model
         'description',
         'prix',
         'prixPromotion',
-
         'isPromotion',
         'pourcentageReduction',
-
         'boutique_id',
         'categorie',
-
         'madeInGabon',
         'image_principale',
 

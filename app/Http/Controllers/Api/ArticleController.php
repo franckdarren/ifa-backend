@@ -24,75 +24,31 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'nom' => 'required|string|max:255',
-            'prix' => 'required|integer',
-            'categorie' => 'required|string',
-            'boutique_id' => 'required|integer',
-
-            // Image principale
-            'image_principale' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-
-            // Galerie d'images
-            'article_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
-
-            // Variations JSON (les images sont envoyées séparément)
-            'variations' => 'nullable|string', // JSON string
+            'description' => 'nullable|string',
+            'prix' => 'required|integer|min:0',
+            'prixPromotion' => 'nullable|integer|min:0',
+            'isPromotion' => 'boolean',
+            'pourcentageReduction' => 'nullable|integer|min:0|max:100',
+            'madeInGabon' => 'boolean',
+            'boutique_id' => 'required|exists:boutiques,id',
+            'categorie' => 'required|string|max:255',
+            'image_principale' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $isPromotion = filter_var($request->isPromotion, FILTER_VALIDATE_BOOLEAN);
-        $madeInGabon = filter_var($request->madeInGabon, FILTER_VALIDATE_BOOLEAN);
-
-        // ✅ Image principale
-        $imagePrincipalePath = null;
         if ($request->hasFile('image_principale')) {
-            $imagePrincipalePath = $request->file('image_principale')->store('articles', 'public');
+            $path = $request->file('image_principale')->store('articles', 'public');
+            $validatedData['image_principale'] = $path;
         }
 
-        // ✅ Création de l’article
-        $article = Article::create([
-            'nom' => $request->nom,
-            'description' => $request->description,
-            'prix' => $request->prix,
-            'prixPromotion' => $request->prixPromotion,
-            'isPromotion' => $isPromotion,
-            'pourcentageReduction' => $request->pourcentageReduction,
-            'madeInGabon' => $madeInGabon,
-            'boutique_id' => $request->boutique_id,
-            'categorie' => $request->categorie,
-            'image_principale' => $imagePrincipalePath,
-        ]);
+        $article = Article::create($validatedData);
 
-
-        // ✅ Variations (fichier séparé : variation_images_0, etc.)
-        if ($request->filled('variations')) {
-            $variations = json_decode($request->variations, true);
-
-            foreach ($variations as $index => $variationData) {
-                $variationImagePath = null;
-
-                // Vérifie si un fichier 'variation_images_{index}' existe
-                $fileKey = "variation_images_$index";
-                if ($request->hasFile($fileKey)) {
-                    $variationImagePath = $request->file($fileKey)->store('variations', 'public');
-                }
-
-                $article->variations()->create([
-                    'couleur' => $variationData['couleur'],
-                    'taille' => $variationData['taille'],
-                    'stock' => $variationData['stock'],
-                    'prix' => $variationData['prix'] ?? null,
-                    'image' => $variationImagePath,
-                ]);
-            }
-        }
-
-        return response()->json($article->load('variations', 'images'), 201);
+        return response()->json([
+            'message' => 'Article créé avec succès',
+            'article' => $article
+        ], 201);
     }
-
-
-
-
 
 
     /**
