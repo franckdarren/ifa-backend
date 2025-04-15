@@ -34,27 +34,22 @@ class ArticleController extends Controller
             'image_principale' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
 
             // Galerie d'images
-            'article_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'article_images.*' => 'image|mimes:jpeg,png,jpg|max:5120',
 
-            // Variations
-            'variations' => 'required|array',
-            'variations.*.couleur' => 'required|string',
-            'variations.*.taille' => 'required|string',
-            'variations.*.stock' => 'required|integer',
-            'variations.*.prix' => 'nullable|integer',
-            'variations.*.image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // Variations JSON (les images sont envoyées séparément)
+            'variations' => 'nullable|string', // JSON string
         ]);
 
         $isPromotion = filter_var($request->isPromotion, FILTER_VALIDATE_BOOLEAN);
         $madeInGabon = filter_var($request->madeInGabon, FILTER_VALIDATE_BOOLEAN);
 
-        // Stocker l'image principale
+        // ✅ Image principale
         $imagePrincipalePath = null;
         if ($request->hasFile('image_principale')) {
             $imagePrincipalePath = $request->file('image_principale')->store('articles', 'public');
         }
 
-        // Création de l'article
+        // ✅ Création de l’article
         $article = Article::create([
             'nom' => $request->nom,
             'description' => $request->description,
@@ -68,36 +63,33 @@ class ArticleController extends Controller
             'image_principale' => $imagePrincipalePath,
         ]);
 
-        // Galerie d’images supplémentaires
-        // if ($request->hasFile('article_images')) {
-        //     foreach ($request->file('article_images') as $image) {
-        //         $path = $image->store('articles', 'public');
-        //         $article->images()->create([
-        //             'url_photo' => $path
-        //         ]);
-        //     }
-        // }
 
-        // Création des variations
-        foreach ($request->variations as $variationData) {
-            $variationImagePath = null;
+        // ✅ Variations (fichier séparé : variation_images_0, etc.)
+        if ($request->filled('variations')) {
+            $variations = json_decode($request->variations, true);
 
-            // Gérer l'image de la variation (si envoyée)
-            if (isset($variationData['image']) && $variationData['image'] instanceof \Illuminate\Http\UploadedFile) {
-                $variationImagePath = $variationData['image']->store('variations', 'public');
+            foreach ($variations as $index => $variationData) {
+                $variationImagePath = null;
+
+                // Vérifie si un fichier 'variation_images_{index}' existe
+                $fileKey = "variation_images_$index";
+                if ($request->hasFile($fileKey)) {
+                    $variationImagePath = $request->file($fileKey)->store('variations', 'public');
+                }
+
+                $article->variations()->create([
+                    'couleur' => $variationData['couleur'],
+                    'taille' => $variationData['taille'],
+                    'stock' => $variationData['stock'],
+                    'prix' => $variationData['prix'] ?? null,
+                    'image' => $variationImagePath,
+                ]);
             }
-
-            $article->variations()->create([
-                'couleur' => $variationData['couleur'],
-                'taille' => $variationData['taille'],
-                'stock' => $variationData['stock'],
-                'prix' => $variationData['prix'] ?? null,
-                'image' => $variationImagePath,
-            ]);
         }
 
         return response()->json($article->load('variations', 'images'), 201);
     }
+
 
 
 
