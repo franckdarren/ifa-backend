@@ -69,14 +69,14 @@ class ArticleController extends Controller
         ]);
 
         // Galerie d’images supplémentaires
-        if ($request->hasFile('article_images')) {
-            foreach ($request->file('article_images') as $image) {
-                $path = $image->store('articles', 'public');
-                $article->images()->create([
-                    'url_photo' => $path
-                ]);
-            }
-        }
+        // if ($request->hasFile('article_images')) {
+        //     foreach ($request->file('article_images') as $image) {
+        //         $path = $image->store('articles', 'public');
+        //         $article->images()->create([
+        //             'url_photo' => $path
+        //         ]);
+        //     }
+        // }
 
         // Création des variations
         foreach ($request->variations as $variationData) {

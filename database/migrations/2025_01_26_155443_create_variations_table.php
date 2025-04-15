@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('taille')->nullable();
             $table->integer('stock')->default(0);  // Stock pour chaque variation
             $table->integer('prix')->nullable();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

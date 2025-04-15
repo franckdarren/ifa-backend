@@ -24,6 +24,7 @@ return new class extends Migration {
 
             $table->foreignId('boutique_id')->constrained('boutiques')->onDelete('cascade');
             $table->string('categorie');
+            $table->string('image_principale')->nullable();
 
 
             $table->timestamps();
