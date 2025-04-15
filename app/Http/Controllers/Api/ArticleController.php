@@ -31,10 +31,10 @@ class ArticleController extends Controller
             'boutique_id' => 'required|integer',
 
             // Image principale
-            'image_principale' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'image_principale' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
 
             // Galerie d'images
-            'article_images.*' => 'image|mimes:jpeg,png,jpg|max:5120',
+            'article_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
 
             // Variations JSON (les images sont envoyées séparément)
             'variations' => 'nullable|string', // JSON string
