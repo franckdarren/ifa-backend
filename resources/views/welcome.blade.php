@@ -1210,33 +1210,22 @@
     @endif
 </head>
 
-<body class="font-sans antialiased dark:bg-black dark:text-white/50">
-    <div class="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
-        <div class=" flex justify-end selection:text-white">
-            <div class="">
-                <header class=""
-                    @if (Route::has('login')) <nav class="-mx-3 flex flex-1 justify-end">
-                            @auth
-                                <a href="{{ url('/dashboard') }}"
-                                    class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
-                                    Dashboard
-                                </a>
-                            @else
-                                <a href="{{ route('login') }}"
-                                    class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
-                                    Se connecter
-                                </a>
-                            @endauth
-                        </nav> @endif
-                    </header>
-
-                    <main class="mt-6">
-
-                    </main>
-
-
-            </div>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-2xl text-center">
+        <div class="flex justify-center mb-5">
+            <img src="/logo.png" alt="logo" class="h-[200px]">
         </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-[#0A2D4D] mb-4">
+            Bienvenue, Administrateur
+        </h2>
+        <p class="text-gray-600 text-base md:text-lg mb-8">
+            Connectez-vous pour accéder à votre tableau de bord
+            et gérer votre plateforme en toute sécurité.
+        </p>
+        <a href="{{ route('login') }}"
+            class="bg-[#0A2D4D] hover:bg-[#08385f] text-white px-6 py-3 rounded-lg w-full font-semibold text-lg transition duration-300 border border-[#A9f04b]">
+            Se connecter
+        </a>
     </div>
 </body>
 
