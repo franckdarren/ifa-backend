@@ -11,8 +11,20 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends Controller
 {
+
     /**
      * Display a listing of the resource.
+     */
+    /**
+     * @OA\Get(
+     *     path="/api/users",
+     *     summary="Liste tous les utilisateurs",
+     *     tags={"Utilisateurs"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des utilisateurs"
+     *     )
+     * )
      */
     public function index()
     {
@@ -26,6 +38,28 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     */
+    /**
+     * @OA\Post(
+     *     path="/api/users",
+     *     summary="Créer un nouvel utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","role","password"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", example="john@example.com"),
+     *             @OA\Property(property="role", type="string", example="Boutique"),
+     *             @OA\Property(property="password", type="string", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Utilisateur créé"
+     *     ),
+     *     @OA\Response(response=500, description="Erreur serveur")
+     * )
      */
     public function store(Request $request)
     {
@@ -54,6 +88,22 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
+    /**
+     * @OA\Get(
+     *     path="/api/users/{id}",
+     *     summary="Afficher un utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'utilisateur",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Utilisateur trouvé"),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
     public function show(string $id)
     {
         // Afficher un utilisateur spécifique
@@ -68,6 +118,28 @@ class UserController extends Controller
 
     /**
      * Update the specified resource in storage.
+     */
+    /**
+     * @OA\Put(
+     *     path="/api/users/{id}",
+     *     summary="Mettre à jour un utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'utilisateur",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="John Updated"),
+     *             @OA\Property(property="password", type="string", example="newpass123")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Utilisateur mis à jour"),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
      */
     public function update(Request $request, string $id)
     {
@@ -94,6 +166,22 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * @OA\Delete(
+     *     path="/api/users/{id}",
+     *     summary="Supprimer un utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'utilisateur",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Utilisateur supprimé"),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
     public function destroy(string $id)
     {
         try {
@@ -107,7 +195,22 @@ class UserController extends Controller
         }
     }
 
-
+    /**
+     * @OA\Get(
+     *     path="/api/users/{id}/boutique",
+     *     summary="Afficher la boutique de l'utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'utilisateur",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Données de la boutique"),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
     public function boutique(string $id)
     {
         //Supprimer un user
@@ -122,7 +225,22 @@ class UserController extends Controller
         return response()->json($boutique, 200);
     }
 
-
+    /**
+     * @OA\Get(
+     *     path="/api/users/{id}/livraisons",
+     *     summary="Afficher les livraisons de l'utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'utilisateur",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Liste des livraisons"),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
     public function livraisons(string $id)
     {
         //Supprimer un user
@@ -137,6 +255,22 @@ class UserController extends Controller
         return response()->json($livraisons, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/users/{id}/reclamations",
+     *     summary="Afficher les réclamations de l'utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'utilisateur",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Liste des réclamations"),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
     public function reclamations(string $id)
     {
         //Supprimer un user
@@ -151,6 +285,22 @@ class UserController extends Controller
         return response()->json($reclamations, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/users/{id}/commandes",
+     *     summary="Afficher les commandes de l'utilisateur",
+     *     tags={"Utilisateurs"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'utilisateur",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Liste des commandes"),
+     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     * )
+     */
     public function commandes(string $id)
     {
         //Supprimer un user

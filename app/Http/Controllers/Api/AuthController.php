@@ -11,6 +11,37 @@ use Kreait\Firebase\Auth as FirebaseAuth;
 
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="Connexion avec email et mot de passe",
+     *     tags={"Authentification"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="test@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Connexion réussie",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Login successful"),
+     *             @OA\Property(property="token", type="string", example="sanctum-token-123456"),
+     *             @OA\Property(property="user", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Échec d'authentification",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Email ou mot de passe incorrect")
+     *         )
+     *     )
+     * )
+     */
     // Fonction pour gérer la connexion et renvoyer le token
     public function login(Request $request)
     {
