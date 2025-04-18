@@ -93,11 +93,29 @@
                 "tags": [
                     "Authentification"
                 ],
-                "summary": "Connexion avec Firebase (token dans Authorization Bearer)",
-                "operationId": "8a078535981971c85d6301a261a9504a",
+                "summary": "Connexion avec Firebase",
+                "description": "Connecte un utilisateur via Firebase, crée l'utilisateur s'il n'existe pas et génère un token Sanctum.",
+                "operationId": "firebaseLogin",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "role": {
+                                        "description": "Rôle de l'utilisateur (Client, Boutique, etc.)",
+                                        "type": "string",
+                                        "example": "Client"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "Utilisateur authentifié via Firebase",
+                        "description": "Connexion réussie",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -106,12 +124,34 @@
                                             "type": "string",
                                             "example": "Utilisateur authentifié"
                                         },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "johndoe@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "Client"
+                                                },
+                                                "firebase_uid": {
+                                                    "type": "string",
+                                                    "example": "firebase_uid_123"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
                                         "token": {
                                             "type": "string",
-                                            "example": "sanctum-token-123456"
-                                        },
-                                        "user": {
-                                            "type": "object"
+                                            "example": "1|sometokenstring"
                                         }
                                     },
                                     "type": "object"
@@ -120,14 +160,30 @@
                         }
                     },
                     "401": {
-                        "description": "Token Firebase manquant ou invalide",
+                        "description": "Token Firebase invalide ou manquant",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "error": {
                                             "type": "string",
-                                            "example": "Token Firebase manquant ou invalide"
+                                            "example": "Token Firebase manquant"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Erreur interne"
                                         }
                                     },
                                     "type": "object"
@@ -305,34 +361,6 @@
                 }
             }
         },
-        "/api/users/{id}/boutique": {
-            "get": {
-                "tags": [
-                    "Utilisateurs"
-                ],
-                "summary": "Afficher la boutique de l'utilisateur",
-                "operationId": "e524255d8e07eab0834ae5ab8e7de372",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID de l'utilisateur",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Données de la boutique"
-                    },
-                    "404": {
-                        "description": "Utilisateur non trouvé"
-                    }
-                }
-            }
-        },
         "/api/users/{id}/livraisons": {
             "get": {
                 "tags": [
@@ -435,21 +463,50 @@
                     },
                     "name": {
                         "type": "string",
-                        "example": "Jean Dupont"
+                        "example": "Boutique LeBoss"
                     },
                     "role": {
                         "type": "string",
-                        "example": "Client"
+                        "example": "Boutique"
                     },
                     "email": {
                         "type": "string",
                         "format": "email",
-                        "example": "jean@example.com"
+                        "example": "leboss@boutique.com"
+                    },
+                    "url_logo": {
+                        "type": "string",
+                        "example": "https://cdn.maboutique.com/logo123.png",
+                        "nullable": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+241074000000",
+                        "nullable": true
+                    },
+                    "heure_ouverture": {
+                        "type": "string",
+                        "example": "08:00",
+                        "nullable": true
+                    },
+                    "heure_fermeture": {
+                        "type": "string",
+                        "example": "18:00",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Boutique spécialisée dans les vêtements africains",
+                        "nullable": true
+                    },
+                    "solde": {
+                        "type": "integer",
+                        "example": 15000
                     },
                     "email_verified_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-04-17T10:00:00Z",
+                        "example": "2025-04-18T10:30:00Z",
                         "nullable": true
                     },
                     "password": {
@@ -459,7 +516,7 @@
                     },
                     "remember_token": {
                         "type": "string",
-                        "example": "randomtoken123",
+                        "example": "token123",
                         "nullable": true
                     },
                     "current_team_id": {
@@ -469,7 +526,7 @@
                     },
                     "profile_photo_path": {
                         "type": "string",
-                        "example": "profile/photos/user123.jpg",
+                        "example": "/storage/profile/user123.jpg",
                         "nullable": true
                     },
                     "firebase_uid": {
@@ -484,12 +541,12 @@
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-04-17T09:00:00Z"
+                        "example": "2025-04-18T08:00:00Z"
                     },
                     "updated_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-04-17T10:00:00Z"
+                        "example": "2025-04-18T10:00:00Z"
                     }
                 },
                 "type": "object"

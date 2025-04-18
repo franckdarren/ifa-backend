@@ -22,7 +22,7 @@ return new class extends Migration {
 
             $table->boolean('madeInGabon')->default(false);
 
-            $table->foreignId('boutique_id')->constrained('boutiques')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('categorie');
             $table->string('image_principale')->nullable();
 

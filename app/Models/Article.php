@@ -38,7 +38,7 @@ class Article extends Model
      */
     public function boutique()
     {
-        return $this->belongsTo(Boutique::class);
+        return $this->belongsTo(User::class);
     }
 
     public function commandes(): BelongsToMany

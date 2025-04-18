@@ -31,6 +31,13 @@ class User extends Authenticatable
         'password',
         'role',
         'firebase_uid',
+        'url_logo',
+        'phone',
+        'heure_ouverture',
+        'heure_fermeture',
+        'description',
+        'solde',
+        'abonnement',
     ];
 
     /**
@@ -67,8 +74,13 @@ class User extends Authenticatable
         ];
     }
 
-    public function boutique()
+    public function articles()
     {
-        return $this->hasOne(Boutique::class);
+        return $this->hasMany(Article::class);
+    }
+
+    public function livraisons()
+    {
+        return $this->hasMany(Livraison::class);
     }
 }

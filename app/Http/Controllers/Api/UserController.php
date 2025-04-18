@@ -195,35 +195,6 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/users/{id}/boutique",
-     *     summary="Afficher la boutique de l'utilisateur",
-     *     tags={"Utilisateurs"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID de l'utilisateur",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(response=200, description="Données de la boutique"),
-     *     @OA\Response(response=404, description="Utilisateur non trouvé")
-     * )
-     */
-    public function boutique(string $id)
-    {
-        //Supprimer un user
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'Utilisateur non trouvé'], 404);
-        }
-
-        $boutique = $user->boutique();
-
-        return response()->json($boutique, 200);
-    }
 
     /**
      * @OA\Get(

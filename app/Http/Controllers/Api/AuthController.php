@@ -73,27 +73,46 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/firebase-login",
-     *     summary="Connexion avec Firebase (token dans Authorization Bearer)",
+     *     summary="Connexion avec Firebase",
+     *     description="Connecte un utilisateur via Firebase, crée l'utilisateur s'il n'existe pas et génère un token Sanctum.",
+     *     operationId="firebaseLogin",
      *     tags={"Authentification"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="role", type="string", example="Client", description="Rôle de l'utilisateur (Client, Boutique, etc.)")
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Utilisateur authentifié via Firebase",
+     *         description="Connexion réussie",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Utilisateur authentifié"),
-     *             @OA\Property(property="token", type="string", example="sanctum-token-123456"),
-     *             @OA\Property(property="user", type="object")
+     *             @OA\Property(property="user", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="johndoe@example.com"),
+     *                 @OA\Property(property="role", type="string", example="Client"),
+     *                 @OA\Property(property="firebase_uid", type="string", example="firebase_uid_123")
+     *             ),
+     *             @OA\Property(property="token", type="string", example="1|sometokenstring")
      *         )
      *     ),
      *     @OA\Response(
      *         response=401,
-     *         description="Token Firebase manquant ou invalide",
+     *         description="Token Firebase invalide ou manquant",
      *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="Token Firebase manquant ou invalide")
+     *             @OA\Property(property="error", type="string", example="Token Firebase manquant")
      *         )
      *     ),
-     *     security={
-     *         {"bearerAuth": {}}
-     *     }
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erreur interne",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Erreur interne")
+     *         )
+     *     )
      * )
      */
 
@@ -118,7 +137,7 @@ class AuthController extends Controller
                 $user = User::create([
                     'name' => $firebaseUser->displayName,
                     'email' => $firebaseUser->email,
-                    'role' => 'Boutique',
+                    'role' => $request->boutique,
                     'firebase_uid' => $firebaseUser->uid,
                     'password' => null, // Pas de mot de passe pour les utilisateurs Firebase
                 ]);

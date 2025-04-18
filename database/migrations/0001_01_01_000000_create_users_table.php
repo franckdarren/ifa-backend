@@ -15,6 +15,15 @@ return new class extends Migration {
             $table->string('name');
             $table->string('role');
             $table->string('email')->unique();
+
+            $table->string('url_logo')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('heure_ouverture')->nullable();
+            $table->string('heure_fermeture')->nullable();
+            $table->string('description')->nullable();
+            $table->integer('solde')->default(0);
+
+
             $table->timestamp('email_verified_at')->nullable();
 
             $table->string('password')->nullable();
