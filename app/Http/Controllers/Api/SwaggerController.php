@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 
 /**
  * @OA\Info(
- *     title="API de Mon Application",
+ *     title="API de Ewuang",
  *     version="1.0.0",
  *     description="Documentation de l'API pour mon application Ewuang"
  * ),
@@ -15,12 +15,6 @@ use App\Http\Controllers\Controller;
  *     url=L5_SWAGGER_CONST_HOST,
  *     description="Serveur API"
  * ),
- * @OA\SecurityScheme(
- *     securityScheme="bearerAuth",
- *     type="http",
- *     scheme="bearer",
- *     bearerFormat="JWT"
- * )
  */
 
 

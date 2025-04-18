@@ -70,6 +70,33 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/firebase-login",
+     *     summary="Connexion avec Firebase (token dans Authorization Bearer)",
+     *     tags={"Authentification"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Utilisateur authentifié via Firebase",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Utilisateur authentifié"),
+     *             @OA\Property(property="token", type="string", example="sanctum-token-123456"),
+     *             @OA\Property(property="user", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Token Firebase manquant ou invalide",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Token Firebase manquant ou invalide")
+     *         )
+     *     ),
+     *     security={
+     *         {"bearerAuth": {}}
+     *     }
+     * )
+     */
+
     public function firebaseLogin(Request $request)
     {
         $firebaseAuth = app(FirebaseAuth::class);
