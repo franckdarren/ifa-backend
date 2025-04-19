@@ -22,9 +22,10 @@ class DashboardCount extends Component
     {
         // Rafraîchir les données à chaque requête
         $this->nbreClient = User::where('role', 'Client')->count();
-        $this->nbreBoutique = Boutique::count();
+        $this->nbreBoutique = User::where('role', 'Boutique')->count();
         $this->nbreLivraison = Livraison::count();
-        $this->nbreArticle = Article::count();;
+        $this->nbreArticle = Article::count();
+        ;
         $this->nbreCommande = Commande::count();
 
         return view('livewire.dashboard-count', [

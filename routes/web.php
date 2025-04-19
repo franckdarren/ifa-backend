@@ -31,9 +31,9 @@ Route::middleware([
         return view('articles');
     })->name('articles');
 
-    Route::get('/boutiques', action: function () {
-        return view('boutiques');
-    })->name('boutiques');
+    Route::get('/users', action: function () {
+        return view('users');
+    })->name('users');
 
     Route::get('/categories', action: function () {
         return view('categories');
@@ -59,5 +59,3 @@ Route::middleware([
         return view('publicites');
     })->name('publicites');
 });
-
-
