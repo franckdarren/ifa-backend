@@ -57,7 +57,7 @@ class AuthController extends Controller
         }
 
         // Si authentifié, récupère l'utilisateur
-        $user = Auth::user()->load('boutique');
+        $user = Auth::user();
 
         // Crée un token pour cet utilisateur
         $token = $user->createToken('auth_token')->plainTextToken;
