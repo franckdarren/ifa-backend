@@ -68,21 +68,40 @@ class UserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'role' => 'required|in:Administrateur,Client,Boutique',
-                'password' => 'required|string|min:6',
+                'password' => 'nullable|string|min:6',
+                'phone' => 'nullable|string|max:20',
+                'url_logo' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:1000',
+                'firebase_uid' => 'nullable|string|max:255',
+                // 'abonnement' => 'nullable|string|max:255',
+                'heure_ouverture' => 'nullable|string|max:255',
+                'heure_fermeture' => 'nullable|string|max:255',
             ]);
 
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'role' => $validatedData['role'],
-                'password' => bcrypt($validatedData['password']),
+                'password' => isset($validatedData['password'])
+                    ? bcrypt($validatedData['password'])
+                    : null,
+                'phone' => $validatedData['phone'] ?? null,
+                'url_logo' => $validatedData['url_logo'] ?? null,
+                'description' => $validatedData['description'] ?? null,
+                'firebase_uid' => $validatedData['firebase_uid'] ?? null,
+                // 'abonnement' => $validatedData['abonnement'] ?? 'Simple',
+                'heure_ouverture' => $validatedData['heure_ouverture'] ?? null,
+                'heure_fermeture' => $validatedData['heure_fermeture'] ?? null,
+
+
             ]);
 
             return response()->json($user->makeHidden(['password']), 201);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Impossible de créer l\'utilisateur'], 500);
+            return response()->json(['error' => 'Impossible de créer l\'utilisateur', 'message' => $e->getMessage()], 500);
         }
     }
+
 
 
     /**
