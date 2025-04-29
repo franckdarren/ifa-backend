@@ -35,6 +35,13 @@ class ArticleController extends Controller
             'boutique_id' => 'required|exists:boutiques,id',
             'categorie' => 'required|string|max:255',
             'image_principale' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+            'variations' => 'required|array|min:1',
+            'variations.*.taille' => 'required|string',
+            'variations.*.couleur' => 'required|string',
+            'variations.*.stock' => 'required|integer|min:0',
+            'variations.*.price' => 'required|numeric',
+            'variations.*.image' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image_principale')) {
@@ -44,10 +51,22 @@ class ArticleController extends Controller
 
         $article = Article::create($validatedData);
 
-        return response()->json([
-            'message' => 'Article créé avec succès',
-            'article' => $article
-        ], 201);
+        foreach ($validatedData['variations'] as $variationData) {
+            $imagePath = null;
+            if (isset($variationData['image'])) {
+                $imagePath = $variationData['image']->store('variations', 'public');
+            }
+
+            $article->variations()->create([
+                'taille' => $variationData['taille'],
+                'couleur' => $variationData['couleur'],
+                'stock' => $variationData['stock'],
+                'price' => $variationData['price'],
+                'image' => $imagePath,
+            ]);
+        }
+
+        return response()->json($article->load('variations'), 201);
     }
 
 
