@@ -155,4 +155,30 @@ class AuthController extends Controller
             return response()->json(['error' => 'Token Firebase invalide'], 401);
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="Déconnexion",
+     *     tags={"Authentification"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Déconnexion réussie",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Déconnexion réussie")
+     *         )
+     *     )
+     * )
+     */
+    public function logout(Request $request)
+    {
+        // Supprimer le token actuel utilisé pour l'authentification
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Déconnexion réussie',
+        ]);
+    }
+
 }

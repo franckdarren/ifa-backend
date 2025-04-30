@@ -24,6 +24,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::post('/users', [UserController::class, 'store']);  // Créer un nouvel utilisateur
 
 // Login with firebase
@@ -31,6 +32,8 @@ Route::post('/firebase-login', [AuthController::class, 'firebaseLogin']);
 
 Route::middleware('auth:sanctum')->group(function () {
     // Actions utilisateurs
+    Route::post('/logout', [AuthController::class, 'logout']);
+
     Route::get('/users', [UserController::class, 'index']);   // Liste tous les utilisateurs
     Route::get('/users/{id}', [UserController::class, 'show']); // Afficher un utilisateur spécifique
     Route::put('/users/{id}', [UserController::class, 'update']); // Mettre à jour un utilisateur
@@ -41,10 +44,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/{id}/livraisons', [UserController::class, 'livraisons']); // Liste les livraisons
     Route::get('/users/{id}/reclamations', [UserController::class, 'reclamations']); // Liste les reclamations
 
-    Route::get('/check-shop/{userId}', function ($userId) {
-        $hasShop = Boutique::where('user_id', $userId)->exists();
-        return response()->json(['hasShop' => $hasShop]);
-    });
 
     // Gestion Publicités
     Route::prefix('publicites')->group(function () {
@@ -54,22 +53,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('{id}', [PubliciteController::class, 'update']); // Mettre à jour une publicité
         Route::delete('{id}', [PubliciteController::class, 'destroy']); // Supprimer une publicité
     });
-
-    // Gestion des Catégories (uniquement admin)
-    Route::prefix('categories')->group(function () {
-        Route::get('/', [CategorieController::class, 'index']); // Récupérer toutes les catégories
-        Route::get('{id}', [CategorieController::class, 'show']); // Récupérer une catégorie par son ID
-        Route::post('/', [CategorieController::class, 'store']); // Créer une nouvelle catégorie
-        Route::put('{id}', [CategorieController::class, 'update']); // Mettre à jour une catégorie
-        Route::delete('{id}', [CategorieController::class, 'destroy']); // Supprimer une catégorie
-    });
-
-    // Gestion boutiques
-    Route::get('/boutiques', [BoutiqueController::class, 'index']);
-    Route::post('/boutiques', [BoutiqueController::class, 'store']);
-    Route::get('/boutiques/{id}', [BoutiqueController::class, 'show']);
-    Route::put('/boutiques/{id}', [BoutiqueController::class, 'update']);
-    Route::delete('/boutiques/{id}', [BoutiqueController::class, 'destroy']);
 
     // Gestion Commandes
     Route::get('/commandes', [CommandeController::class, 'index']);

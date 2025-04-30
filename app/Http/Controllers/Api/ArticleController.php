@@ -7,6 +7,7 @@ use App\Models\ImageArticle;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ArticleController extends Controller
 {
@@ -95,28 +96,62 @@ class ArticleController extends Controller
             return response()->json(['message' => 'Article non trouvé'], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'nom' => 'required|string',
-            'description' => 'required|string',
-            'prix' => 'required|integer',
-            'prixPromotion' => 'required|integer',
+        $validatedData = $request->validate([
+            'nom' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'prix' => 'required|integer|min:0',
+            'prixPromotion' => 'nullable|integer|min:0',
+            'isPromotion' => 'boolean',
+            'pourcentageReduction' => 'nullable|integer|min:0|max:100',
+            'madeInGabon' => 'boolean',
+            'boutique_id' => 'required|exists:boutiques,id',
+            'categorie' => 'required|string|max:255',
+            'image_principale' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
-            'type' => 'required|integer',
-            'carateristique' => 'required|integer',
-
-            'isDisponible' => 'required|boolean',
-            'isPromotion' => 'required|boolean',
-            'pourcentageReduction' => 'required|integer',
+            'variations' => 'nullable|array|min:1',
+            'variations.*.id' => 'nullable|exists:variations,id',
+            'variations.*.taille' => 'required|string',
+            'variations.*.couleur' => 'required|string',
+            'variations.*.stock' => 'required|integer|min:0',
+            'variations.*.price' => 'required|numeric',
+            'variations.*.image' => 'nullable|image|max:2048',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        // Mise à jour de l'image principale si fournie
+        if ($request->hasFile('image_principale')) {
+            if ($article->image_principale) {
+                Storage::disk('public')->delete($article->image_principale);
+            }
+
+            $path = $request->file('image_principale')->store('articles', 'public');
+            $validatedData['image_principale'] = $path;
         }
 
-        $article->update($request->all());
-        return response()->json($article, 200);
-    }
+        $article->update($validatedData);
 
+        // Mise à jour ou remplacement des variations si fournies
+        if (isset($validatedData['variations'])) {
+            // Supprimer les anciennes variations (optionnel, selon besoin)
+            $article->variations()->delete();
+
+            foreach ($validatedData['variations'] as $variationData) {
+                $imagePath = null;
+                if (isset($variationData['image'])) {
+                    $imagePath = $variationData['image']->store('variations', 'public');
+                }
+
+                $article->variations()->create([
+                    'taille' => $variationData['taille'],
+                    'couleur' => $variationData['couleur'],
+                    'stock' => $variationData['stock'],
+                    'price' => $variationData['price'],
+                    'image' => $imagePath,
+                ]);
+            }
+        }
+
+        return response()->json($article->load('variations'), 200);
+    }
     /**
      * Remove the specified resource from storage.
      */
