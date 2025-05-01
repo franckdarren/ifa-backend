@@ -14,6 +14,18 @@ class ArticleController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    /**
+     * @OA\Get(
+     *     path="/api/articles",
+     *     summary="Liste des articles",
+     *     tags={"Articles"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des articles récupérée avec succès"
+     *     )
+     * )
+     */
     public function index()
     {
         $articles = Article::with(['images', 'variations'])->get();
@@ -23,6 +35,49 @@ class ArticleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    /**
+     * @OA\Post(
+     *     path="/api/articles",
+     *     summary="Créer un nouvel article",
+     *     tags={"Articles"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"nom", "prix", "user_id", "categorie", "variations"},
+     *                 @OA\Property(property="nom", type="string"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="prix", type="integer"),
+     *                 @OA\Property(property="prixPromotion", type="integer"),
+     *                 @OA\Property(property="isPromotion", type="boolean"),
+     *                 @OA\Property(property="pourcentageReduction", type="integer"),
+     *                 @OA\Property(property="madeInGabon", type="boolean"),
+     *                 @OA\Property(property="user_id", type="integer"),
+     *                 @OA\Property(property="categorie", type="string"),
+     *                 @OA\Property(property="image_principale", type="file"),
+     *                 @OA\Property(
+     *                     property="variations",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="taille", type="string"),
+     *                         @OA\Property(property="couleur", type="string"),
+     *                         @OA\Property(property="stock", type="integer"),
+     *                         @OA\Property(property="price", type="number"),
+     *                         @OA\Property(property="image", type="file")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Article créé avec succès"
+     *     )
+     * )
+     */
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -33,37 +88,43 @@ class ArticleController extends Controller
             'isPromotion' => 'boolean',
             'pourcentageReduction' => 'nullable|integer|min:0|max:100',
             'madeInGabon' => 'boolean',
-            'boutique_id' => 'required|exists:boutiques,id',
+            'user_id' => 'required|exists:boutiques,id',
             'categorie' => 'required|string|max:255',
-            'image_principale' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'image_principale' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image_principale' => 'required|string',
+
 
             'variations' => 'required|array|min:1',
             'variations.*.taille' => 'required|string',
             'variations.*.couleur' => 'required|string',
             'variations.*.stock' => 'required|integer|min:0',
             'variations.*.price' => 'required|numeric',
-            'variations.*.image' => 'nullable|image|max:2048',
+            // 'variations.*.image' => 'nullable|image|max:2048',
+            'variations.*.image' => 'nullable|string',
+
         ]);
 
-        if ($request->hasFile('image_principale')) {
-            $path = $request->file('image_principale')->store('articles', 'public');
-            $validatedData['image_principale'] = $path;
-        }
+        // if ($request->hasFile('image_principale')) {
+        //     $path = $request->file('image_principale')->store('articles', 'public');
+        //     $validatedData['image_principale'] = $path;
+        // }
 
         $article = Article::create($validatedData);
 
         foreach ($validatedData['variations'] as $variationData) {
-            $imagePath = null;
-            if (isset($variationData['image'])) {
-                $imagePath = $variationData['image']->store('variations', 'public');
-            }
+            // $imagePath = null;
+            // if (isset($variationData['image'])) {
+            //     $imagePath = $variationData['image']->store('variations', 'public');
+            // }
 
             $article->variations()->create([
                 'taille' => $variationData['taille'],
                 'couleur' => $variationData['couleur'],
                 'stock' => $variationData['stock'],
                 'price' => $variationData['price'],
-                'image' => $imagePath,
+                'image' => $variationData['image'],
+
+
             ]);
         }
 
@@ -74,6 +135,29 @@ class ArticleController extends Controller
     /**
      * Display the specified resource.
      */
+    /**
+     * @OA\Get(
+     *     path="/api/articles/{id}",
+     *     summary="Afficher un article spécifique",
+     *     tags={"Articles"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'article",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article trouvé"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Article non trouvé"
+     *     )
+     * )
+     */
+
     public function show(string $id)
     {
         $article = Article::with(['images', 'variations.images'])->find($id);
@@ -89,6 +173,26 @@ class ArticleController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    /**
+     * @OA\Put(
+     *     path="/api/articles/{id}",
+     *     summary="Mettre à jour un article",
+     *     tags={"Articles"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'article",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(ref="#/components/requestBodies/ArticleStoreRequest"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article mis à jour avec succès"
+     *     )
+     * )
+     */
+
     public function update(Request $request, string $id)
     {
         $article = Article::find($id);
@@ -104,7 +208,7 @@ class ArticleController extends Controller
             'isPromotion' => 'boolean',
             'pourcentageReduction' => 'nullable|integer|min:0|max:100',
             'madeInGabon' => 'boolean',
-            'boutique_id' => 'required|exists:boutiques,id',
+            'user_id' => 'required|exists:boutiques,id',
             'categorie' => 'required|string|max:255',
             'image_principale' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
@@ -114,18 +218,18 @@ class ArticleController extends Controller
             'variations.*.couleur' => 'required|string',
             'variations.*.stock' => 'required|integer|min:0',
             'variations.*.price' => 'required|numeric',
-            'variations.*.image' => 'nullable|image|max:2048',
+            'variations.*.image' => 'nullable|string',
         ]);
 
         // Mise à jour de l'image principale si fournie
-        if ($request->hasFile('image_principale')) {
-            if ($article->image_principale) {
-                Storage::disk('public')->delete($article->image_principale);
-            }
+        // if ($request->hasFile('image_principale')) {
+        //     if ($article->image_principale) {
+        //         Storage::disk('public')->delete($article->image_principale);
+        //     }
 
-            $path = $request->file('image_principale')->store('articles', 'public');
-            $validatedData['image_principale'] = $path;
-        }
+        //     $path = $request->file('image_principale')->store('articles', 'public');
+        //     $validatedData['image_principale'] = $path;
+        // }
 
         $article->update($validatedData);
 
@@ -135,17 +239,17 @@ class ArticleController extends Controller
             $article->variations()->delete();
 
             foreach ($validatedData['variations'] as $variationData) {
-                $imagePath = null;
-                if (isset($variationData['image'])) {
-                    $imagePath = $variationData['image']->store('variations', 'public');
-                }
+                // $imagePath = null;
+                // if (isset($variationData['image'])) {
+                //     $imagePath = $variationData['image']->store('variations', 'public');
+                // }
 
                 $article->variations()->create([
                     'taille' => $variationData['taille'],
                     'couleur' => $variationData['couleur'],
                     'stock' => $variationData['stock'],
                     'price' => $variationData['price'],
-                    'image' => $imagePath,
+                    'image' => $variationData['image'],
                 ]);
             }
         }
@@ -155,6 +259,29 @@ class ArticleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * @OA\Delete(
+     *     path="/api/articles/{id}",
+     *     summary="Supprimer un article",
+     *     tags={"Articles"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de l'article",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Article supprimé avec succès"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Article non trouvé"
+     *     )
+     * )
+     */
+
     public function destroy(string $id)
     {
         $article = Article::find($id);
@@ -167,10 +294,29 @@ class ArticleController extends Controller
     }
 
     // Récupérer les articles d'une boutique
+    /**
+     * @OA\Get(
+     *     path="/api/articles/boutique/{id}",
+     *     summary="Lister les articles d'une boutique",
+     *     tags={"Articles"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la boutique",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Articles de la boutique récupérés"
+     *     )
+     * )
+     */
+
     public function articlesBoutique(string $id)
     {
         return response()->json(
-            Article::where('boutique_id', $id)
+            Article::where('user_id', $id)
                 ->with(['variations.stocks', 'boutique', 'sousCategorie', 'images', 'variations.images'])
                 ->get(),
             200
@@ -178,6 +324,25 @@ class ArticleController extends Controller
     }
 
     // Récupérer les articles disponibles
+    /**
+     * @OA\Get(
+     *     path="/api/articles/disponibles/{id}",
+     *     summary="Lister les articles disponibles en stock",
+     *     tags={"Articles"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID (non utilisé ici, peut être retiré)",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Articles disponibles récupérés"
+     *     )
+     * )
+     */
+
     public function articlesDisponibles(string $id)
     {
         $articles = Article::whereHas('variations.stocks', function ($query) {

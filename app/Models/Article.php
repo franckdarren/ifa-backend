@@ -14,7 +14,7 @@ class Article extends Model
         'prixPromotion',
         'isPromotion',
         'pourcentageReduction',
-        'boutique_id',
+        'user_id',
         'categorie',
         'madeInGabon',
         'image_principale',

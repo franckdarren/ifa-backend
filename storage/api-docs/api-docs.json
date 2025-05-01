@@ -12,6 +12,234 @@
         }
     ],
     "paths": {
+        "/api/articles": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Liste des articles",
+                "operationId": "93ded9e31119e6bbb22455c72ef97f19",
+                "responses": {
+                    "200": {
+                        "description": "Liste des articles récupérée avec succès"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Créer un nouvel article",
+                "operationId": "75bdc5f953261e6f34852386c9b522c0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prix",
+                                    "user_id",
+                                    "categorie",
+                                    "variations"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "prix": {
+                                        "type": "integer"
+                                    },
+                                    "prixPromotion": {
+                                        "type": "integer"
+                                    },
+                                    "isPromotion": {
+                                        "type": "boolean"
+                                    },
+                                    "pourcentageReduction": {
+                                        "type": "integer"
+                                    },
+                                    "madeInGabon": {
+                                        "type": "boolean"
+                                    },
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "categorie": {
+                                        "type": "string"
+                                    },
+                                    "image_principale": {
+                                        "type": "file"
+                                    },
+                                    "variations": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "taille": {
+                                                    "type": "string"
+                                                },
+                                                "couleur": {
+                                                    "type": "string"
+                                                },
+                                                "stock": {
+                                                    "type": "integer"
+                                                },
+                                                "price": {
+                                                    "type": "number"
+                                                },
+                                                "image": {
+                                                    "type": "file"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Article créé avec succès"
+                    }
+                }
+            }
+        },
+        "/api/articles/{id}": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Afficher un article spécifique",
+                "operationId": "a85697b2464e9aaa3f9980a83edbef88",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'article",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article trouvé"
+                    },
+                    "404": {
+                        "description": "Article non trouvé"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Mettre à jour un article",
+                "operationId": "beb39fc2f8d02c16b41438aadbd9ba03",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'article",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/ArticleStoreRequest"
+                },
+                "responses": {
+                    "200": {
+                        "description": "Article mis à jour avec succès"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Supprimer un article",
+                "operationId": "804276a4147e577744e158b2ce2b58f8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'article",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article supprimé avec succès"
+                    },
+                    "404": {
+                        "description": "Article non trouvé"
+                    }
+                }
+            }
+        },
+        "/api/articles/boutique/{id}": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Lister les articles d'une boutique",
+                "operationId": "70426ed8d3004772b7ffeb528231179a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la boutique",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Articles de la boutique récupérés"
+                    }
+                }
+            }
+        },
+        "/api/articles/disponibles/{id}": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Lister les articles disponibles en stock",
+                "operationId": "877ed3cef88310b193f8eb3fc2614e39",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID (non utilisé ici, peut être retiré)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Articles disponibles récupérés"
+                    }
+                }
+            }
+        },
         "/api/login": {
             "post": {
                 "tags": [
@@ -480,6 +708,79 @@
     },
     "components": {
         "schemas": {
+            "Article": {
+                "title": "Article",
+                "required": [
+                    "id",
+                    "nom",
+                    "prix",
+                    "isPromotion",
+                    "pourcentageReduction",
+                    "madeInGabon",
+                    "user_id",
+                    "categorie"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nom": {
+                        "type": "string",
+                        "example": "Chemise en lin"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Chemise légère pour l'été",
+                        "nullable": true
+                    },
+                    "prix": {
+                        "type": "integer",
+                        "example": 10000
+                    },
+                    "prixPromotion": {
+                        "type": "integer",
+                        "example": 8000,
+                        "nullable": true
+                    },
+                    "isPromotion": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "pourcentageReduction": {
+                        "type": "integer",
+                        "example": 20
+                    },
+                    "madeInGabon": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "categorie": {
+                        "type": "string",
+                        "example": "Vêtements Homme"
+                    },
+                    "image_principale": {
+                        "type": "string",
+                        "example": "https://cdn.maboutique.com/images/article123.jpg",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-30T12:34:56Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-30T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            },
             "User": {
                 "title": "User",
                 "required": [
@@ -582,10 +883,131 @@
                     }
                 },
                 "type": "object"
+            },
+            "Variation": {
+                "title": "Variation",
+                "required": [
+                    "id",
+                    "article_id",
+                    "stock"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "article_id": {
+                        "description": "ID de l'article parent",
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "couleur": {
+                        "type": "string",
+                        "example": "Rouge",
+                        "nullable": true
+                    },
+                    "taille": {
+                        "type": "string",
+                        "example": "M",
+                        "nullable": true
+                    },
+                    "stock": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "prix": {
+                        "type": "integer",
+                        "example": 15000,
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "example": "https://cdn.maboutique.com/variations/img1.jpg",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-30T08:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-30T10:00:00Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "requestBodies": {
+            "ArticleStoreRequest": {
+                "description": "Données pour créer ou mettre à jour un article",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "required": [
+                                "nom",
+                                "prix",
+                                "categorie",
+                                "user_id"
+                            ],
+                            "properties": {
+                                "nom": {
+                                    "type": "string",
+                                    "example": "T-shirt en coton"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "example": "T-shirt 100% coton, confortable"
+                                },
+                                "prix": {
+                                    "type": "integer",
+                                    "example": 10000
+                                },
+                                "prixPromotion": {
+                                    "type": "integer",
+                                    "example": 8000,
+                                    "nullable": true
+                                },
+                                "isPromotion": {
+                                    "type": "boolean",
+                                    "example": false
+                                },
+                                "pourcentageReduction": {
+                                    "type": "integer",
+                                    "example": 0
+                                },
+                                "madeInGabon": {
+                                    "type": "boolean",
+                                    "example": false
+                                },
+                                "user_id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "categorie": {
+                                    "type": "string",
+                                    "example": "Vêtements Femme"
+                                },
+                                "image_principale": {
+                                    "type": "string",
+                                    "example": "https://cdn.maboutique.com/images/tshirt123.jpg",
+                                    "nullable": true
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
             }
         }
     },
     "tags": [
+        {
+            "name": "Articles",
+            "description": "Articles"
+        },
         {
             "name": "Authentification",
             "description": "Authentification"
