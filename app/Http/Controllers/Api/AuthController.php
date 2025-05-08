@@ -73,15 +73,22 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/firebase-login",
-     *     summary="Connexion avec Firebase",
-     *     description="Connecte un utilisateur via Firebase, crée l'utilisateur s'il n'existe pas et génère un token Sanctum.",
+     *     summary="Connexion via Firebase",
+     *     description="Connecte un utilisateur avec un token Firebase. Si l'utilisateur n'existe pas, il est automatiquement créé avec un rôle donné. Un token Sanctum est généré.",
      *     operationId="firebaseLogin",
      *     tags={"Authentification"},
      *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
-     *         required=false,
+     *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="role", type="string", example="Client", description="Rôle de l'utilisateur (Client, Boutique, etc.)")
+     *             required={"role"},
+     *             @OA\Property(
+     *                 property="role",
+     *                 type="string",
+     *                 enum={"Client", "Boutique", "Livreur"},
+     *                 example="Client",
+     *                 description="Rôle de l'utilisateur. Doit être l'un des suivants : Client, Boutique ou Livreur."
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -107,6 +114,13 @@ class AuthController extends Controller
      *         )
      *     ),
      *     @OA\Response(
+     *         response=422,
+     *         description="Rôle invalide",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Rôle invalide")
+     *         )
+     *     ),
+     *     @OA\Response(
      *         response=500,
      *         description="Erreur interne",
      *         @OA\JsonContent(
@@ -116,10 +130,20 @@ class AuthController extends Controller
      * )
      */
 
+
     public function firebaseLogin(Request $request)
     {
         $firebaseAuth = app(FirebaseAuth::class);
         $token = $request->bearerToken();
+
+        $allowedRoles = ['Client', 'Boutique', 'Livreur'];
+
+        $role = $request->input('role');
+
+        if (!in_array($role, $allowedRoles)) {
+            return response()->json(['error' => 'Rôle invalide'], 422);
+        }
+
 
         if (!$token) {
             return response()->json(['error' => 'Token Firebase manquant'], 401);
@@ -137,7 +161,7 @@ class AuthController extends Controller
                 $user = User::create([
                     'name' => $firebaseUser->displayName,
                     'email' => $firebaseUser->email,
-                    'role' => $request->boutique,
+                    'role' => $role,
                     'firebase_uid' => $firebaseUser->uid,
                     'password' => null, // Pas de mot de passe pour les utilisateurs Firebase
                 ]);

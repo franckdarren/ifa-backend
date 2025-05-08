@@ -321,18 +321,26 @@
                 "tags": [
                     "Authentification"
                 ],
-                "summary": "Connexion avec Firebase",
-                "description": "Connecte un utilisateur via Firebase, crée l'utilisateur s'il n'existe pas et génère un token Sanctum.",
+                "summary": "Connexion via Firebase",
+                "description": "Connecte un utilisateur avec un token Firebase. Si l'utilisateur n'existe pas, il est automatiquement créé avec un rôle donné. Un token Sanctum est généré.",
                 "operationId": "firebaseLogin",
                 "requestBody": {
-                    "required": false,
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "role"
+                                ],
                                 "properties": {
                                     "role": {
-                                        "description": "Rôle de l'utilisateur (Client, Boutique, etc.)",
+                                        "description": "Rôle de l'utilisateur. Doit être l'un des suivants : Client, Boutique ou Livreur.",
                                         "type": "string",
+                                        "enum": [
+                                            "Client",
+                                            "Boutique",
+                                            "Livreur"
+                                        ],
                                         "example": "Client"
                                     }
                                 },
@@ -396,6 +404,22 @@
                                         "error": {
                                             "type": "string",
                                             "example": "Token Firebase manquant"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Rôle invalide",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Rôle invalide"
                                         }
                                     },
                                     "type": "object"
