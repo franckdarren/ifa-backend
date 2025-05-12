@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Arr;
 
 class ArticleController extends Controller
 {
@@ -36,47 +37,49 @@ class ArticleController extends Controller
      * Store a newly created resource in storage.
      */
     /**
-     * @OA\Post(
-     *     path="/api/articles",
-     *     summary="Créer un nouvel article",
-     *     tags={"Articles"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                 required={"nom", "prix", "user_id", "categorie", "variations"},
-     *                 @OA\Property(property="nom", type="string"),
-     *                 @OA\Property(property="description", type="string"),
-     *                 @OA\Property(property="prix", type="integer"),
-     *                 @OA\Property(property="prixPromotion", type="integer"),
-     *                 @OA\Property(property="isPromotion", type="boolean"),
-     *                 @OA\Property(property="pourcentageReduction", type="integer"),
-     *                 @OA\Property(property="madeInGabon", type="boolean"),
-     *                 @OA\Property(property="user_id", type="integer"),
-     *                 @OA\Property(property="categorie", type="string"),
-     *                 @OA\Property(property="image_principale", type="file"),
-     *                 @OA\Property(
-     *                     property="variations",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         type="object",
-     *                         @OA\Property(property="taille", type="string"),
-     *                         @OA\Property(property="couleur", type="string"),
-     *                         @OA\Property(property="stock", type="integer"),
-     *                         @OA\Property(property="price", type="number"),
-     *                         @OA\Property(property="image", type="file")
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Article créé avec succès"
-     *     )
-     * )
-     */
+
+ * @OA\Post(
+ *     path="/api/articles",
+ *     summary="Créer un nouvel article",
+ *     tags={"Articles"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 required={"nom", "prix", "user_id", "categorie", "variations"},
+ *                 @OA\Property(property="nom", type="string", example="T-shirt Oversize"),
+ *                 @OA\Property(property="description", type="string", example="Un t-shirt oversize 100% coton, très confortable."),
+ *                 @OA\Property(property="prix", type="integer", example=12000),
+ *                 @OA\Property(property="prixPromotion", type="integer", example=10000),
+ *                 @OA\Property(property="isPromotion", type="boolean", example=true),
+ *                 @OA\Property(property="pourcentageReduction", type="integer", example=20),
+ *                 @OA\Property(property="madeInGabon", type="boolean", example=false),
+ *                 @OA\Property(property="user_id", type="integer", example=3),
+ *                 @OA\Property(property="categorie", type="string", example="Vêtements Homme"),
+ *                 @OA\Property(property="image_principale", type="file"),
+ *                 @OA\Property(
+ *                     property="variations",
+ *                     type="array",
+ *                     @OA\Items(
+ *                         type="object",
+ *                         @OA\Property(property="taille", type="string", example="M"),
+ *                         @OA\Property(property="couleur", type="string", example="Noir"),
+ *                         @OA\Property(property="stock", type="integer", example=10),
+ *                         @OA\Property(property="price", type="number", format="float", example=12000),
+ *                         @OA\Property(property="image", type="file")
+ *                     )
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Article créé avec succès"
+ *     )
+ * )
+ */
+
 
     public function store(Request $request)
     {
@@ -109,7 +112,8 @@ class ArticleController extends Controller
         //     $validatedData['image_principale'] = $path;
         // }
 
-        $article = Article::create($validatedData);
+        $article = Article::create(Arr::except($validatedData, ['variations']));
+
 
         foreach ($validatedData['variations'] as $variationData) {
             // $imagePath = null;

@@ -45,31 +45,40 @@
                                 ],
                                 "properties": {
                                     "nom": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "T-shirt Oversize"
                                     },
                                     "description": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Un t-shirt oversize 100% coton, très confortable."
                                     },
                                     "prix": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": 12000
                                     },
                                     "prixPromotion": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": 10000
                                     },
                                     "isPromotion": {
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "example": true
                                     },
                                     "pourcentageReduction": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": 20
                                     },
                                     "madeInGabon": {
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "example": false
                                     },
                                     "user_id": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": 3
                                     },
                                     "categorie": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Vêtements Homme"
                                     },
                                     "image_principale": {
                                         "type": "file"
@@ -79,16 +88,21 @@
                                         "items": {
                                             "properties": {
                                                 "taille": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "M"
                                                 },
                                                 "couleur": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "Noir"
                                                 },
                                                 "stock": {
-                                                    "type": "integer"
+                                                    "type": "integer",
+                                                    "example": 10
                                                 },
                                                 "price": {
-                                                    "type": "number"
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 12000
                                                 },
                                                 "image": {
                                                     "type": "file"
