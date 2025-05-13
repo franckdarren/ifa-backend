@@ -30,12 +30,13 @@ class Commande extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function articles(): BelongsToMany
+    public function articles()
     {
-        return $this->belongsToMany(Article::class, 'article_commandes')
-                    ->withPivot('quantite', 'prix', 'reduction')
-                    ->withTimestamps();
+        return $this->belongsToMany(Article::class, 'commande_articles')
+            ->withPivot('quantite', 'prix_unitaire', 'variation_id')
+            ->withTimestamps();
     }
+
 
     public function livraison()
     {

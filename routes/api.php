@@ -58,8 +58,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/commandes', [CommandeController::class, 'index']);
     Route::post('/commandes', [CommandeController::class, 'store']);
     Route::get('/commandes/{id}', [CommandeController::class, 'show']);
-    Route::put('/commandes/{id}', [CommandeController::class, 'update']);
-    Route::delete('/commandes/{id}', [CommandeController::class, 'destroy']);
+    // Route::put('/commandes/{id}', [CommandeController::class, 'update']);
+    // Route::delete('/commandes/{id}', [CommandeController::class, 'destroy']);
+    Route::patch('/commandes/{id}/statut', [CommandeController::class, 'updateStatus']);
+
 
     // Gestion des articles
     Route::get('/articles', [ArticleController::class, 'index']);
@@ -72,8 +74,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     // Gestion des article_commandes
-    Route::post('/commandes/{commande_id}/articles', [ArticleCommandeController::class, 'attachArticle']);
-    Route::delete('/commandes/{commande_id}/articles/{article_id}', [ArticleCommandeController::class, 'detachArticle']);
+    // Route::post('/commandes/{commande_id}/articles', [ArticleCommandeController::class, 'attachArticle']);
+    // Route::delete('/commandes/{commande_id}/articles/{article_id}', [ArticleCommandeController::class, 'detachArticle']);
 
     // Gestion image articles
     Route::prefix('articles/{id}/images')->group(function () {

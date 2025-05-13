@@ -497,6 +497,429 @@
                 ]
             }
         },
+        "/api/commandes": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Lister toutes les commandes",
+                "operationId": "dea07d1f5b0214a61007ee81394afb49",
+                "responses": {
+                    "200": {
+                        "description": "Liste des commandes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "numero": {
+                                                "type": "string",
+                                                "example": "CMD-20250513-XYZ"
+                                            },
+                                            "statut": {
+                                                "type": "string",
+                                                "example": "En attente"
+                                            },
+                                            "prix": {
+                                                "type": "integer",
+                                                "example": 15000
+                                            },
+                                            "commentaire": {
+                                                "type": "string",
+                                                "example": "Livraison rapide svp"
+                                            },
+                                            "isLivrable": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "user_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-05-13T12:00:00Z"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-05-13T12:10:00Z"
+                                            },
+                                            "articles": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 10
+                                                        },
+                                                        "nom": {
+                                                            "type": "string",
+                                                            "example": "T-shirt Gabon"
+                                                        },
+                                                        "pivot": {
+                                                            "properties": {
+                                                                "quantite": {
+                                                                    "type": "integer",
+                                                                    "example": 2
+                                                                },
+                                                                "prix_unitaire": {
+                                                                    "type": "integer",
+                                                                    "example": 5000
+                                                                },
+                                                                "variation_id": {
+                                                                    "type": "integer",
+                                                                    "example": 4,
+                                                                    "nullable": true
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Créer une commande",
+                "operationId": "a0adabc1247408638906a1730771c649",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "isLivrable",
+                                    "articles"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "commentaire": {
+                                        "type": "string",
+                                        "example": "Livraison rapide svp"
+                                    },
+                                    "isLivrable": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "articles": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "article_id",
+                                                "quantite"
+                                            ],
+                                            "properties": {
+                                                "article_id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "variation_id": {
+                                                    "type": "integer",
+                                                    "example": 4,
+                                                    "nullable": true
+                                                },
+                                                "quantite": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Commande créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 42
+                                        },
+                                        "numero": {
+                                            "type": "string",
+                                            "example": "CMD-20250513-XYZ"
+                                        },
+                                        "statut": {
+                                            "type": "string",
+                                            "example": "En attente"
+                                        },
+                                        "prix": {
+                                            "type": "integer",
+                                            "example": 15000
+                                        },
+                                        "isLivrable": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "articles": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "article_id": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "variation_id": {
+                                                        "type": "integer",
+                                                        "example": 4,
+                                                        "nullable": true
+                                                    },
+                                                    "quantite": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "prix_unitaire": {
+                                                        "type": "integer",
+                                                        "example": 5000
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/commandes/{id}": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Afficher une commande spécifique",
+                "operationId": "e2139b0d214645abdde594d82da2f048",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la commande",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de la commande",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "numero": {
+                                            "type": "string",
+                                            "example": "CMD-20250513-XYZ"
+                                        },
+                                        "statut": {
+                                            "type": "string",
+                                            "example": "En attente"
+                                        },
+                                        "prix": {
+                                            "type": "integer",
+                                            "example": 15000
+                                        },
+                                        "commentaire": {
+                                            "type": "string",
+                                            "example": "Livraison rapide svp"
+                                        },
+                                        "isLivrable": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-05-13T12:00:00Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-05-13T12:10:00Z"
+                                        },
+                                        "articles": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "nom": {
+                                                        "type": "string",
+                                                        "example": "T-shirt Gabon"
+                                                    },
+                                                    "pivot": {
+                                                        "properties": {
+                                                            "quantite": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "prix_unitaire": {
+                                                                "type": "integer",
+                                                                "example": 5000
+                                                            },
+                                                            "variation_id": {
+                                                                "type": "integer",
+                                                                "example": 4,
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commande non trouvée"
+                    }
+                }
+            }
+        },
+        "/api/commandes/{id}/statut": {
+            "patch": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Mettre à jour le statut d'une commande",
+                "operationId": "539c1ceeb5b0bb51f6480e20e28c1f04",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la commande",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "statut"
+                                ],
+                                "properties": {
+                                    "statut": {
+                                        "description": "Nouveau statut de la commande. Valeurs possibles : En attente, En préparation, Prête pour livraison, En cours de livraison, Livrée, Annulée, Remboursée",
+                                        "type": "string",
+                                        "example": "Livrée"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Statut mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Statut mis à jour avec succès."
+                                        },
+                                        "commande": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "statut": {
+                                                    "type": "string",
+                                                    "example": "Livrée"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-05-13T14:30:00Z"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-05-13T13:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation échouée"
+                    },
+                    "404": {
+                        "description": "Commande non trouvée"
+                    }
+                }
+            }
+        },
         "/api/users": {
             "get": {
                 "tags": [
@@ -1049,6 +1472,10 @@
         {
             "name": "Authentification",
             "description": "Authentification"
+        },
+        {
+            "name": "Commandes",
+            "description": "Commandes"
         },
         {
             "name": "Utilisateurs",

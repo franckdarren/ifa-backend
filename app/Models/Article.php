@@ -41,12 +41,13 @@ class Article extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function commandes(): BelongsToMany
+    public function commandes()
     {
-        return $this->belongsToMany(Commande::class, 'article_commandes')
-            ->withPivot('quantite', 'prix', 'reduction')
+        return $this->belongsToMany(Commande::class, 'commande_articles')
+            ->withPivot('quantite', 'prix_unitaire')
             ->withTimestamps();
     }
+
 
     public function images()
     {
