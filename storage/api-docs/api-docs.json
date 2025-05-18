@@ -335,8 +335,8 @@
                 "tags": [
                     "Authentification"
                 ],
-                "summary": "Connexion via Firebase",
-                "description": "Connecte un utilisateur avec un token Firebase. Si l'utilisateur n'existe pas, il est automatiquement créé avec un rôle donné. Un token Sanctum est généré.",
+                "summary": "Connexion avec Firebase UID",
+                "description": "Connexion d'un utilisateur via Firebase UID. Si l'utilisateur n'existe pas, il est créé.",
                 "operationId": "firebaseLogin",
                 "requestBody": {
                     "required": true,
@@ -344,11 +344,26 @@
                         "application/json": {
                             "schema": {
                                 "required": [
+                                    "firebase_uid",
+                                    "email",
+                                    "name",
                                     "role"
                                 ],
                                 "properties": {
+                                    "firebase_uid": {
+                                        "type": "string",
+                                        "example": "abc123UIDFirebase"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "johndoe@example.com"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
                                     "role": {
-                                        "description": "Rôle de l'utilisateur. Doit être l'un des suivants : Client, Boutique ou Livreur.",
                                         "type": "string",
                                         "enum": [
                                             "Client",
@@ -356,6 +371,11 @@
                                             "Livreur"
                                         ],
                                         "example": "Client"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -365,7 +385,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Connexion réussie",
+                        "description": "Utilisateur authentifié avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -394,30 +414,14 @@
                                                 },
                                                 "firebase_uid": {
                                                     "type": "string",
-                                                    "example": "firebase_uid_123"
+                                                    "example": "abc123UIDFirebase"
                                                 }
                                             },
                                             "type": "object"
                                         },
                                         "token": {
                                             "type": "string",
-                                            "example": "1|sometokenstring"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token Firebase invalide ou manquant",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Token Firebase manquant"
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOi..."
                                         }
                                     },
                                     "type": "object"
@@ -426,14 +430,14 @@
                         }
                     },
                     "422": {
-                        "description": "Rôle invalide",
+                        "description": "Données invalides",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "error": {
                                             "type": "string",
-                                            "example": "Rôle invalide"
+                                            "example": "Données incomplètes ou rôle invalide"
                                         }
                                     },
                                     "type": "object"
@@ -441,15 +445,15 @@
                             }
                         }
                     },
-                    "500": {
-                        "description": "Erreur interne",
+                    "401": {
+                        "description": "Erreur d'authentification",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "error": {
                                             "type": "string",
-                                            "example": "Erreur interne"
+                                            "example": "Authentification échouée"
                                         }
                                     },
                                     "type": "object"
@@ -457,12 +461,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/logout": {

@@ -73,27 +73,24 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/firebase-login",
-     *     summary="Connexion via Firebase",
-     *     description="Connecte un utilisateur avec un token Firebase. Si l'utilisateur n'existe pas, il est automatiquement créé avec un rôle donné. Un token Sanctum est généré.",
+     *     summary="Connexion avec Firebase UID",
+     *     description="Connexion d'un utilisateur via Firebase UID. Si l'utilisateur n'existe pas, il est créé.",
      *     operationId="firebaseLogin",
      *     tags={"Authentification"},
-     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"role"},
-     *             @OA\Property(
-     *                 property="role",
-     *                 type="string",
-     *                 enum={"Client", "Boutique", "Livreur"},
-     *                 example="Client",
-     *                 description="Rôle de l'utilisateur. Doit être l'un des suivants : Client, Boutique ou Livreur."
-     *             )
+     *             required={"firebase_uid", "email", "name", "role"},
+     *             @OA\Property(property="firebase_uid", type="string", example="abc123UIDFirebase"),
+     *             @OA\Property(property="email", type="string", format="email", example="johndoe@example.com"),
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="role", type="string", enum={"Client", "Boutique", "Livreur"}, example="Client"),
+     *             @OA\Property(property="password", type="string", nullable=true, example="secret")
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Connexion réussie",
+     *         description="Utilisateur authentifié avec succès",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Utilisateur authentifié"),
      *             @OA\Property(property="user", type="object",
@@ -101,84 +98,72 @@ class AuthController extends Controller
      *                 @OA\Property(property="name", type="string", example="John Doe"),
      *                 @OA\Property(property="email", type="string", example="johndoe@example.com"),
      *                 @OA\Property(property="role", type="string", example="Client"),
-     *                 @OA\Property(property="firebase_uid", type="string", example="firebase_uid_123")
+     *                 @OA\Property(property="firebase_uid", type="string", example="abc123UIDFirebase")
      *             ),
-     *             @OA\Property(property="token", type="string", example="1|sometokenstring")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Token Firebase invalide ou manquant",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="Token Firebase manquant")
+     *             @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOi...")
      *         )
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Rôle invalide",
+     *         description="Données invalides",
      *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="Rôle invalide")
+     *             @OA\Property(property="error", type="string", example="Données incomplètes ou rôle invalide")
      *         )
      *     ),
      *     @OA\Response(
-     *         response=500,
-     *         description="Erreur interne",
+     *         response=401,
+     *         description="Erreur d'authentification",
      *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", example="Erreur interne")
+     *             @OA\Property(property="error", type="string", example="Authentification échouée")
      *         )
      *     )
      * )
      */
-
-
     public function firebaseLogin(Request $request)
     {
-        $firebaseAuth = app(FirebaseAuth::class);
-        $token = $request->bearerToken();
-
         $allowedRoles = ['Client', 'Boutique', 'Livreur'];
 
         $role = $request->input('role');
+        $firebaseUid = $request->input('firebase_uid');
+        $email = $request->input('email');
+        $name = $request->input('name');
+        $password = $request->input('password');
+
 
         if (!in_array($role, $allowedRoles)) {
             return response()->json(['error' => 'Rôle invalide'], 422);
         }
 
-
-        if (!$token) {
-            return response()->json(['error' => 'Token Firebase manquant'], 401);
+        if (!$firebaseUid || !$email || !$name || !$password) {
+            return response()->json(['error' => 'Données incomplètes'], 422);
         }
 
-        try {
-            $verifiedIdToken = $firebaseAuth->verifyIdToken($token);
-            $firebaseUser = $firebaseAuth->getUser($verifiedIdToken->claims()->get('sub'));
+        // Rechercher l'utilisateur par UID ou par email
+        $user = User::where('firebase_uid', $firebaseUid)
+            ->orWhere('email', $email)
+            ->first();
 
-            // Vérifier si l'utilisateur existe déjà
-            $user = User::where('firebase_uid', $firebaseUser->uid)->orWhere('email', $firebaseUser->email)->first();
-
-            if (!$user) {
-                // Si l'utilisateur n'existe pas, le créer
-                $user = User::create([
-                    'name' => $firebaseUser->displayName,
-                    'email' => $firebaseUser->email,
-                    'role' => $role,
-                    'firebase_uid' => $firebaseUser->uid,
-                    'password' => null, // Pas de mot de passe pour les utilisateurs Firebase
-                ]);
-            }
-
-            // Générer un token Sanctum
-            $sanctumToken = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json([
-                'message' => 'Utilisateur authentifié',
-                'user' => $user,
-                'token' => $sanctumToken,
+        if (!$user) {
+            // Créer un nouvel utilisateur s'il n'existe pas
+            $user = User::create([
+                'name' => $name,
+                'email' => $email,
+                'role' => $role,
+                'firebase_uid' => $firebaseUid,
+                'password' => $password, // Pas de mot de passe
             ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Token Firebase invalide'], 401);
         }
+
+        // Générer un token Sanctum
+        $sanctumToken = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Utilisateur authentifié',
+            'user' => $user,
+            'token' => $sanctumToken,
+        ]);
     }
+
 
     /**
      * @OA\Post(
