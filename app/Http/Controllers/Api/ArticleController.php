@@ -91,7 +91,7 @@ class ArticleController extends Controller
             'isPromotion' => 'boolean',
             'pourcentageReduction' => 'nullable|integer|min:0|max:100',
             'madeInGabon' => 'boolean',
-            'user_id' => 'required|exists:boutiques,id',
+            'user_id' => 'required|exists:users,id',
             'categorie' => 'required|string|max:255',
             // 'image_principale' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'image_principale' => 'required|string',
