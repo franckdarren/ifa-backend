@@ -76,7 +76,7 @@ class ListArticle extends Component implements HasForms, HasTable
                     ->label('Catégorie')
                     ->searchable(),
 
-                TextColumn::make('user.name')
+                TextColumn::make('boutique.name')
                     ->label('Boutique')
                     ->searchable(),
 
