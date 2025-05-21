@@ -321,7 +321,7 @@ class ArticleController extends Controller
     {
         return response()->json(
             Article::where('user_id', $id)
-                ->with(['variations.stocks', 'boutique', 'sousCategorie', 'images', 'variations.images'])
+                ->with(['variations'])
                 ->get(),
             200
         );

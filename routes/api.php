@@ -69,8 +69,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/articles/{id}', [ArticleController::class, 'show']);
     Route::put('/articles/{id}', [ArticleController::class, 'update']);
     Route::delete('/articles/{id}', [ArticleController::class, 'destroy']);
-    Route::get('form-schema', [ArticleController::class, 'getSchema']);
     Route::get('articles-disponibles', [ArticleController::class, 'articlesDisponibles']);
+    Route::get('articles/boutique/{id}', [ArticleController::class, 'articlesBoutique']);
+
 
 
     // Gestion des article_commandes
