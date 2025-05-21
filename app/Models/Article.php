@@ -36,7 +36,7 @@ class Article extends Model
      * Relation avec le modèle `Boutique`.
      * Un article appartient à une boutique.
      */
-    public function boutique()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

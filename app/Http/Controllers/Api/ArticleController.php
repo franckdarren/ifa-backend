@@ -29,7 +29,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = Article::with(['images', 'variations'])->get();
+        $articles = Article::with(['variations'])->get();
         return response()->json($articles);
     }
 
@@ -164,7 +164,7 @@ class ArticleController extends Controller
 
     public function show(string $id)
     {
-        $article = Article::with(['images', 'variations.images'])->find($id);
+        $article = Article::with(['variations'])->find($id);
 
         if (!$article) {
             return response()->json(['message' => 'Article non trouvé'], 404);
@@ -212,12 +212,11 @@ class ArticleController extends Controller
             'isPromotion' => 'boolean',
             'pourcentageReduction' => 'nullable|integer|min:0|max:100',
             'madeInGabon' => 'boolean',
-            'user_id' => 'required|exists:boutiques,id',
+            'user_id' => 'required|exists:users,id', // ✅ correction ici
             'categorie' => 'required|string|max:255',
-            'image_principale' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image_principale' => 'nullable|string', // ✅ on reste sur string comme dans store()
 
             'variations' => 'nullable|array|min:1',
-            'variations.*.id' => 'nullable|exists:variations,id',
             'variations.*.taille' => 'required|string',
             'variations.*.couleur' => 'required|string',
             'variations.*.stock' => 'required|integer|min:0',
@@ -225,41 +224,27 @@ class ArticleController extends Controller
             'variations.*.image' => 'nullable|string',
         ]);
 
-        // Mise à jour de l'image principale si fournie
-        // if ($request->hasFile('image_principale')) {
-        //     if ($article->image_principale) {
-        //         Storage::disk('public')->delete($article->image_principale);
-        //     }
+        // Mise à jour de l'article sans les variations
+        $article->update(Arr::except($validatedData, ['variations']));
 
-        //     $path = $request->file('image_principale')->store('articles', 'public');
-        //     $validatedData['image_principale'] = $path;
-        // }
-
-        $article->update($validatedData);
-
-        // Mise à jour ou remplacement des variations si fournies
+        // Si les variations sont fournies, on les remplace toutes
         if (isset($validatedData['variations'])) {
-            // Supprimer les anciennes variations (optionnel, selon besoin)
             $article->variations()->delete();
 
             foreach ($validatedData['variations'] as $variationData) {
-                // $imagePath = null;
-                // if (isset($variationData['image'])) {
-                //     $imagePath = $variationData['image']->store('variations', 'public');
-                // }
-
                 $article->variations()->create([
                     'taille' => $variationData['taille'],
                     'couleur' => $variationData['couleur'],
                     'stock' => $variationData['stock'],
                     'price' => $variationData['price'],
-                    'image' => $variationData['image'],
+                    'image' => $variationData['image'] ?? null,
                 ]);
             }
         }
 
         return response()->json($article->load('variations'), 200);
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -328,32 +313,14 @@ class ArticleController extends Controller
     }
 
     // Récupérer les articles disponibles
-    /**
-     * @OA\Get(
-     *     path="/api/articles/disponibles/{id}",
-     *     summary="Lister les articles disponibles en stock",
-     *     tags={"Articles"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID (non utilisé ici, peut être retiré)",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Articles disponibles récupérés"
-     *     )
-     * )
-     */
 
-    public function articlesDisponibles(string $id)
-    {
-        $articles = Article::whereHas('variations.stocks', function ($query) {
-            $query->where('stock', '>=', 1);
-        })->get();
+    // public function articlesDisponibles(string $id)
+    // {
+    //     $articles = Article::whereHas('variations.stocks', function ($query) {
+    //         $query->where('stock', '>=', 1);
+    //     })->get();
 
-        return response()->json($articles);
-    }
+    //     return response()->json($articles);
+    // }
 
 }

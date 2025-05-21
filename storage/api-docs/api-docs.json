@@ -229,31 +229,6 @@
                 }
             }
         },
-        "/api/articles/disponibles/{id}": {
-            "get": {
-                "tags": [
-                    "Articles"
-                ],
-                "summary": "Lister les articles disponibles en stock",
-                "operationId": "877ed3cef88310b193f8eb3fc2614e39",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID (non utilisé ici, peut être retiré)",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Articles disponibles récupérés"
-                    }
-                }
-            }
-        },
         "/api/login": {
             "post": {
                 "tags": [
