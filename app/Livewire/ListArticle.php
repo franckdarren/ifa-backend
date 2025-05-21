@@ -76,11 +76,11 @@ class ListArticle extends Component implements HasForms, HasTable
                     ->label('Catégorie')
                     ->searchable(),
 
-                TextColumn::make('boutique.nom')
+                TextColumn::make('user.name')
                     ->label('Boutique')
                     ->searchable(),
 
-                ImageColumn::make('images.url_photo')
+                ImageColumn::make('image_principale')
                     ->circular()
                     ->stacked()
 
