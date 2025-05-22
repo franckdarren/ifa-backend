@@ -49,9 +49,9 @@ class Article extends Model
     }
 
 
-    public function images()
-    {
-        return $this->hasMany(ImageArticle::class)->whereNull('variation_id'); // Récupère uniquement les images générales;
-    }
+    // public function images()
+    // {
+    //     return $this->hasMany(ImageArticle::class)->whereNull('variation_id'); // Récupère uniquement les images générales;
+    // }
 
 }

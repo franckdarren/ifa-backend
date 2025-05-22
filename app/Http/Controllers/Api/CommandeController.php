@@ -106,15 +106,21 @@ class CommandeController extends Controller
                 $article = Article::findOrFail($item['article_id']);
 
                 if (!empty($item['variation_id'])) {
-                    $variation = $article->variations()->findOrFail($item['variation_id']);
+                    $variation = $article->variations()->where('id', $item['variation_id'])->lockForUpdate()->firstOrFail();
 
-                    // Si le prix de la variation est différent de 0, on l'utilise, sinon on prend le prix de l'article
+                    // Vérification du stock
+                    if ($variation->stock < $item['quantite']) {
+                        throw new \Exception("Stock insuffisant pour la variation ID {$variation->id}");
+                    }
+
+                    // Débiter le stock
+                    $variation->decrement('stock', $item['quantite']);
+
+                    // Calcul du prix
                     $prixUnitaire = $variation->prix != 0 ? $variation->prix : ($article->isPromotion ? $article->prixPromotion : $article->prix);
                 } else {
-                    // Si aucune variation n'est spécifiée, on prend directement le prix de l'article
                     $prixUnitaire = $article->isPromotion ? $article->prixPromotion : $article->prix;
                 }
-
 
                 $sousTotal = $prixUnitaire * $item['quantite'];
                 $total += $sousTotal;
@@ -125,6 +131,7 @@ class CommandeController extends Controller
                     'prix_unitaire' => $prixUnitaire,
                 ]);
             }
+
 
 
             // Mise à jour du prix total
