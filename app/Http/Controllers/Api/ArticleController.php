@@ -66,7 +66,7 @@ class ArticleController extends Controller
  *                         @OA\Property(property="taille", type="string", example="M"),
  *                         @OA\Property(property="couleur", type="string", example="Noir"),
  *                         @OA\Property(property="stock", type="integer", example=10),
- *                         @OA\Property(property="price", type="number", format="float", example=12000),
+ *                         @OA\Property(property="prix", type="number", format="float", example=12000),
  *                         @OA\Property(property="image", type="file")
  *                     )
  *                 )
@@ -101,7 +101,7 @@ class ArticleController extends Controller
             'variations.*.taille' => 'required|string',
             'variations.*.couleur' => 'required|string',
             'variations.*.stock' => 'required|integer|min:0',
-            'variations.*.price' => 'required|numeric',
+            'variations.*.prix' => 'required|numeric',
             // 'variations.*.image' => 'nullable|image|max:2048',
             'variations.*.image' => 'nullable|string',
 
@@ -125,7 +125,7 @@ class ArticleController extends Controller
                 'taille' => $variationData['taille'],
                 'couleur' => $variationData['couleur'],
                 'stock' => $variationData['stock'],
-                'price' => $variationData['price'],
+                'prix' => $variationData['prix'],
                 'image' => $variationData['image'],
 
 
@@ -220,7 +220,7 @@ class ArticleController extends Controller
             'variations.*.taille' => 'required|string',
             'variations.*.couleur' => 'required|string',
             'variations.*.stock' => 'required|integer|min:0',
-            'variations.*.price' => 'required|numeric',
+            'variations.*.prix' => 'required|numeric',
             'variations.*.image' => 'nullable|string',
         ]);
 
@@ -236,7 +236,7 @@ class ArticleController extends Controller
                     'taille' => $variationData['taille'],
                     'couleur' => $variationData['couleur'],
                     'stock' => $variationData['stock'],
-                    'price' => $variationData['price'],
+                    'prix' => $variationData['prix'],
                     'image' => $variationData['image'] ?? null,
                 ]);
             }
