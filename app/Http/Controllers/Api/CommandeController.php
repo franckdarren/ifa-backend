@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
 use App\Models\Article;
 use App\Models\Commande;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 
 
 class CommandeController extends Controller
@@ -130,6 +131,38 @@ class CommandeController extends Controller
                     'quantite' => $item['quantite'],
                     'prix_unitaire' => $prixUnitaire,
                 ]);
+
+                $admin = User::admin();
+
+                // mise à jour du solde de la boutique si le tarif de article est inférieur à 15000
+                if ($prixUnitaire < 15000) {
+                    $frais = 300 * $item['quantite']; // frais de service
+                    $benefice = $sousTotal - $frais; // bénéfice après frais
+                    $article->boutique->increment('solde', $benefice);
+                    // Incrémenter le solde
+                    $admin->solde += $frais;
+                    $admin->save();
+                }
+
+                if ($prixUnitaire > 15000 && $prixUnitaire < 50000) {
+                    $frais = 500 * $item['quantite']; // frais de service
+                    $benefice = $sousTotal - $frais; // bénéfice après frais
+                    $article->boutique->increment('solde', $benefice);
+                    // Incrémenter le solde
+                    $admin->solde += $frais;
+                    $admin->save();
+                }
+
+                if ($prixUnitaire > 50000) {
+                    $frais = 1000 * $item['quantite']; // frais de service
+                    $benefice = $sousTotal - $frais; // bénéfice après frais
+                    $article->boutique->increment('solde', $benefice);
+                    // Incrémenter le solde
+                    $admin->solde += $frais;
+                    $admin->save();
+                }
+
+                // $article->boutique->increment('solde', $sousTotal);
             }
 
 

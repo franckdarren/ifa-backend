@@ -83,4 +83,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Livraison::class);
     }
+
+    public static function admin()
+    {
+        return self::where('role', 'Administrateur')->first();
+    }
 }
