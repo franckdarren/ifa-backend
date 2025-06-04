@@ -323,4 +323,94 @@ class ArticleController extends Controller
     //     return response()->json($articles);
     // }
 
+    // filtrer les articles par catégorie
+    /**
+     * @OA\Get(
+     *     path="/api/articles/categorie/{categorie}",
+     *     summary="Lister les articles par catégorie",
+     *     tags={"Articles"},
+     *     @OA\Parameter(
+     *         name="categorie",
+     *         in="path",
+     *         required=true,
+     *         description="Nom de la catégorie",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Articles de la catégorie récupérés"
+     *     )
+     * )
+     */
+    public function articlesCategorie(string $categorie)
+    {
+        $articles = Article::where('categorie', $categorie)
+            ->with(['variations'])
+            ->get();
+
+        if ($articles->isEmpty()) {
+            return response()->json(['message' => 'Aucun article trouvé pour cette catégorie'], 404);
+        }
+
+        return response()->json($articles, 200);
+    }
+
+    // Récupérer les articles en promotion
+    /**
+     * @OA\Get(
+     *     path="/api/articles/promotion",
+     *     summary="Lister les articles en promotion",
+     *     tags={"Articles"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Articles en promotion récupérés"
+     *     )
+     * )
+     */
+    public function articlesPromotion()
+    {
+        $articles = Article::where('isPromotion', true)
+            ->with(['variations'])
+            ->get();
+
+        if ($articles->isEmpty()) {
+            return response()->json(['message' => 'Aucun article en promotion trouvé'], 404);
+        }
+
+        return response()->json($articles, 200);
+    }
+
+    // Rechercher un article
+    /**
+     * @OA\Get(
+     *     path="/api/articles/recherche/{query}",
+     *     summary="Rechercher des articles",
+     *     tags={"Articles"},
+     *     @OA\Parameter(
+     *         name="query",
+     *         in="path",
+     *         required=true,
+     *         description="Termes de recherche",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Articles trouvés"
+     *     )
+     * )
+     */
+    public function searchArticles(string $query)
+    {
+        $articles = Article::where('nom', 'like', '%' . $query . '%')
+            ->orWhere('description', 'like', '%' . $query . '%')
+            ->with(['variations'])
+            ->get();
+
+        if ($articles->isEmpty()) {
+            return response()->json(['message' => 'Aucun article trouvé pour cette recherche'], 404);
+        }
+
+        return response()->json($articles, 200);
+    }
+
 }
