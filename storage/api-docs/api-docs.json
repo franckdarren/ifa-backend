@@ -99,7 +99,7 @@
                                                     "type": "integer",
                                                     "example": 10
                                                 },
-                                                "price": {
+                                                "prix": {
                                                     "type": "number",
                                                     "format": "float",
                                                     "example": 12000
@@ -225,6 +225,70 @@
                 "responses": {
                     "200": {
                         "description": "Articles de la boutique récupérés"
+                    }
+                }
+            }
+        },
+        "/api/articles/categorie/{categorie}": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Lister les articles par catégorie",
+                "operationId": "1377153f0d13684a0bcc1730b62c3a97",
+                "parameters": [
+                    {
+                        "name": "categorie",
+                        "in": "path",
+                        "description": "Nom de la catégorie",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Articles de la catégorie récupérés"
+                    }
+                }
+            }
+        },
+        "/api/articles/promotion": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Lister les articles en promotion",
+                "operationId": "374d499f7b01ae4203564fb09abe2b30",
+                "responses": {
+                    "200": {
+                        "description": "Articles en promotion récupérés"
+                    }
+                }
+            }
+        },
+        "/api/articles/recherche/{query}": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Rechercher des articles",
+                "operationId": "3c6372565fea9b9b99f118fec8e3614f",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "path",
+                        "description": "Termes de recherche",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Articles trouvés"
                     }
                 }
             }
@@ -573,6 +637,7 @@
                     "Commandes"
                 ],
                 "summary": "Créer une commande",
+                "description": "Créer une commande.\n\nCette route permet à un utilisateur de passer une commande avec ou sans variations\npour les articles sélectionnés. Elle tient compte du stock, applique des frais de\nlivraison selon la localisation et met à jour les soldes des boutiques et de\nl'administrateur selon des paliers de prix.",
                 "operationId": "a0adabc1247408638906a1730771c649",
                 "requestBody": {
                     "required": true,
@@ -582,6 +647,7 @@
                                 "required": [
                                     "user_id",
                                     "isLivrable",
+                                    "adresse_livraison",
                                     "articles"
                                 ],
                                 "properties": {
@@ -596,6 +662,10 @@
                                     "isLivrable": {
                                         "type": "boolean",
                                         "example": true
+                                    },
+                                    "adresse_livraison": {
+                                        "type": "string",
+                                        "example": "Libreville, quartier Louis"
                                     },
                                     "articles": {
                                         "type": "array",
@@ -635,54 +705,76 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "id": {
-                                            "type": "integer",
-                                            "example": 42
-                                        },
-                                        "numero": {
+                                        "message": {
                                             "type": "string",
-                                            "example": "CMD-20250513-XYZ"
+                                            "example": "Commande créée avec succès"
                                         },
-                                        "statut": {
-                                            "type": "string",
-                                            "example": "En attente"
-                                        },
-                                        "prix": {
-                                            "type": "integer",
-                                            "example": 15000
-                                        },
-                                        "isLivrable": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "user_id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "articles": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "article_id": {
-                                                        "type": "integer",
-                                                        "example": 10
-                                                    },
-                                                    "variation_id": {
-                                                        "type": "integer",
-                                                        "example": 4,
-                                                        "nullable": true
-                                                    },
-                                                    "quantite": {
-                                                        "type": "integer",
-                                                        "example": 2
-                                                    },
-                                                    "prix_unitaire": {
-                                                        "type": "integer",
-                                                        "example": 5000
-                                                    }
+                                        "commande": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 42
                                                 },
-                                                "type": "object"
-                                            }
+                                                "numero": {
+                                                    "type": "string",
+                                                    "example": "CMD-ABC1234567"
+                                                },
+                                                "statut": {
+                                                    "type": "string",
+                                                    "example": "En attente"
+                                                },
+                                                "prix": {
+                                                    "type": "integer",
+                                                    "example": 15000
+                                                },
+                                                "isLivrable": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "commentaire": {
+                                                    "type": "string",
+                                                    "example": "Livraison rapide svp"
+                                                },
+                                                "adresse_livraison": {
+                                                    "type": "string",
+                                                    "example": "Libreville, quartier Louis"
+                                                },
+                                                "articles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "pivot": {
+                                                                "properties": {
+                                                                    "variation_id": {
+                                                                        "type": "integer",
+                                                                        "example": 4,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "quantite": {
+                                                                        "type": "integer",
+                                                                        "example": 2
+                                                                    },
+                                                                    "prix_unitaire": {
+                                                                        "type": "integer",
+                                                                        "example": 5000
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -692,6 +784,9 @@
                     },
                     "422": {
                         "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur lors de la création de la commande"
                     }
                 }
             }

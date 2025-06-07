@@ -33,7 +33,7 @@ class CommandeController extends Controller
      *             @OA\Property(property="user_id", type="integer", example=1),
      *             @OA\Property(property="commentaire", type="string", example="Livraison rapide svp"),
      *             @OA\Property(property="isLivrable", type="boolean", example=true),
-     *             @OA\Property(property="adresse_livraison", type="string", example="Libreville, quartier Louis"),
+     *             @OA\Property(property="adresse_livraison", type="string", example="Libreville"),
      *             @OA\Property(
      *                 property="articles",
      *                 type="array",
@@ -62,7 +62,7 @@ class CommandeController extends Controller
      *                 @OA\Property(property="isLivrable", type="boolean", example=true),
      *                 @OA\Property(property="user_id", type="integer", example=1),
      *                 @OA\Property(property="commentaire", type="string", example="Livraison rapide svp"),
-     *                 @OA\Property(property="adresse_livraison", type="string", example="Libreville, quartier Louis"),
+     *                 @OA\Property(property="adresse_livraison", type="string", example="Libreville"),
      *                 @OA\Property(
      *                     property="articles",
      *                     type="array",
