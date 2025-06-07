@@ -16,8 +16,12 @@ class CommandeController extends Controller
 {
     /**
      * Créer une commande.
-     */
-    /**
+     *
+     * Cette route permet à un utilisateur de passer une commande avec ou sans variations
+     * pour les articles sélectionnés. Elle tient compte du stock, applique des frais de
+     * livraison selon la localisation et met à jour les soldes des boutiques et de
+     * l'administrateur selon des paliers de prix.
+     *
      * @OA\Post(
      *     path="/api/commandes",
      *     summary="Créer une commande",
@@ -25,10 +29,11 @@ class CommandeController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"user_id", "isLivrable", "articles"},
+     *             required={"user_id", "isLivrable", "articles", "adresse_livraison"},
      *             @OA\Property(property="user_id", type="integer", example=1),
      *             @OA\Property(property="commentaire", type="string", example="Livraison rapide svp"),
      *             @OA\Property(property="isLivrable", type="boolean", example=true),
+     *             @OA\Property(property="adresse_livraison", type="string", example="Libreville"),
      *             @OA\Property(
      *                 property="articles",
      *                 type="array",
@@ -46,21 +51,30 @@ class CommandeController extends Controller
      *         response=201,
      *         description="Commande créée avec succès",
      *         @OA\JsonContent(
-     *             @OA\Property(property="id", type="integer", example=42),
-     *             @OA\Property(property="numero", type="string", example="CMD-20250513-XYZ"),
-     *             @OA\Property(property="statut", type="string", example="En attente"),
-     *             @OA\Property(property="prix", type="integer", example=15000),
-     *             @OA\Property(property="isLivrable", type="boolean", example=true),
-     *             @OA\Property(property="user_id", type="integer", example=1),
+     *             @OA\Property(property="message", type="string", example="Commande créée avec succès"),
      *             @OA\Property(
-     *                 property="articles",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="article_id", type="integer", example=10),
-     *                     @OA\Property(property="variation_id", type="integer", nullable=true, example=4),
-     *                     @OA\Property(property="quantite", type="integer", example=2),
-     *                     @OA\Property(property="prix_unitaire", type="integer", example=5000)
+     *                 property="commande",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=42),
+     *                 @OA\Property(property="numero", type="string", example="CMD-ABC1234567"),
+     *                 @OA\Property(property="statut", type="string", example="En attente"),
+     *                 @OA\Property(property="prix", type="integer", example=15000),
+     *                 @OA\Property(property="isLivrable", type="boolean", example=true),
+     *                 @OA\Property(property="user_id", type="integer", example=1),
+     *                 @OA\Property(property="commentaire", type="string", example="Livraison rapide svp"),
+     *                 @OA\Property(property="adresse_livraison", type="string", example="Libreville"),
+     *                 @OA\Property(
+     *                     property="articles",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=10),
+     *                         @OA\Property(property="pivot", type="object",
+     *                             @OA\Property(property="variation_id", type="integer", nullable=true, example=4),
+     *                             @OA\Property(property="quantite", type="integer", example=2),
+     *                             @OA\Property(property="prix_unitaire", type="integer", example=5000)
+     *                         )
+     *                     )
      *                 )
      *             )
      *         )
@@ -68,9 +82,14 @@ class CommandeController extends Controller
      *     @OA\Response(
      *         response=422,
      *         description="Erreur de validation"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erreur lors de la création de la commande"
      *     )
      * )
      */
+
 
     public function store(Request $request)
     {
@@ -82,15 +101,16 @@ class CommandeController extends Controller
             'articles.*.article_id' => 'required|exists:articles,id',
             'articles.*.variation_id' => 'nullable|exists:variations,id',
             'articles.*.quantite' => 'required|integer|min:1',
+            'adresse_livraison' => 'required|string|max:255',
         ]);
-
 
         DB::beginTransaction();
 
         try {
             $total = 0;
+            $adminFrais = 0;
 
-            // Générer un numéro unique de commande
+            // Générer un numéro de commande unique
             $numeroCommande = 'CMD-' . strtoupper(uniqid());
 
             // Créer la commande
@@ -100,74 +120,67 @@ class CommandeController extends Controller
                 'commentaire' => $validated['commentaire'] ?? '',
                 'statut' => 'En attente',
                 'isLivrable' => $validated['isLivrable'],
-                'prix' => 0, // temporairement, sera mis à jour après
+                'prix' => 0,
+                'adresse_livraison' => $validated['adresse_livraison'],
             ]);
+
+            $admin = User::admin();
 
             foreach ($validated['articles'] as $item) {
                 $article = Article::findOrFail($item['article_id']);
+                $quantite = $item['quantite'];
 
                 if (!empty($item['variation_id'])) {
-                    $variation = $article->variations()->where('id', $item['variation_id'])->lockForUpdate()->firstOrFail();
+                    $variation = $article->variations()
+                        ->where('id', $item['variation_id'])
+                        ->lockForUpdate()
+                        ->firstOrFail();
 
-                    // Vérification du stock
-                    if ($variation->stock < $item['quantite']) {
+                    if ($variation->stock < $quantite) {
                         throw new \Exception("Stock insuffisant pour la variation ID {$variation->id}");
                     }
 
-                    // Débiter le stock
-                    $variation->decrement('stock', $item['quantite']);
-
-                    // Calcul du prix
-                    $prixUnitaire = $variation->prix != 0 ? $variation->prix : ($article->isPromotion ? $article->prixPromotion : $article->prix);
+                    $variation->decrement('stock', $quantite);
+                    $prixUnitaire = $variation->prix != 0
+                        ? $variation->prix
+                        : ($article->isPromotion ? $article->prixPromotion : $article->prix);
                 } else {
                     $prixUnitaire = $article->isPromotion ? $article->prixPromotion : $article->prix;
                 }
 
-                $sousTotal = $prixUnitaire * $item['quantite'];
+                $sousTotal = $prixUnitaire * $quantite;
                 $total += $sousTotal;
 
                 $commande->articles()->attach($article->id, [
                     'variation_id' => $item['variation_id'] ?? null,
-                    'quantite' => $item['quantite'],
+                    'quantite' => $quantite,
                     'prix_unitaire' => $prixUnitaire,
                 ]);
 
-                $admin = User::admin();
-
-                // mise à jour du solde de la boutique si le tarif de article est inférieur à 15000
+                // Définir les frais de service selon le tarif
                 if ($prixUnitaire < 15000) {
-                    $frais = 300 * $item['quantite']; // frais de service
-                    $benefice = $sousTotal - $frais; // bénéfice après frais
-                    $article->boutique->increment('solde', $benefice);
-                    // Incrémenter le solde
-                    $admin->solde += $frais;
-                    $admin->save();
+                    $frais = 300 * $quantite;
+                } elseif ($prixUnitaire < 50000) {
+                    $frais = 500 * $quantite;
+                } else {
+                    $frais = 1000 * $quantite;
                 }
 
-                if ($prixUnitaire > 15000 && $prixUnitaire < 50000) {
-                    $frais = 500 * $item['quantite']; // frais de service
-                    $benefice = $sousTotal - $frais; // bénéfice après frais
-                    $article->boutique->increment('solde', $benefice);
-                    // Incrémenter le solde
-                    $admin->solde += $frais;
-                    $admin->save();
-                }
-
-                if ($prixUnitaire > 50000) {
-                    $frais = 1000 * $item['quantite']; // frais de service
-                    $benefice = $sousTotal - $frais; // bénéfice après frais
-                    $article->boutique->increment('solde', $benefice);
-                    // Incrémenter le solde
-                    $admin->solde += $frais;
-                    $admin->save();
-                }
-
-                // $article->boutique->increment('solde', $sousTotal);
+                $benefice = $sousTotal - $frais;
+                $article->boutique->increment('solde', $benefice);
+                $adminFrais += $frais;
             }
 
+            // Ajouter les frais de livraison selon la ville
+            $livraison = match (strtolower($validated['adresse_livraison'])) {
+                'libreville' => 2000,
+                'akanda' => 2000,
+                default => 2500,
+            };
+            $total += $livraison;
 
-
-            // Mise à jour du prix total
+            // Mise à jour du solde admin et du prix total de la commande
+            $admin->increment('solde', $adminFrais);
             $commande->update(['prix' => $total]);
 
             DB::commit();
@@ -176,15 +189,16 @@ class CommandeController extends Controller
                 'message' => 'Commande créée avec succès',
                 'commande' => $commande->load('articles'),
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'message' => 'Erreur lors de la création de la commande',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
+
 
     /**
      * Liste des commandes (facultatif)

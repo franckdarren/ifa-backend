@@ -14,6 +14,7 @@ class Commande extends Model
         'commentaire',
         'isLivrable',
         'user_id', // Lien avec l'utilisateur qui a passé la commande
+        'adresse_livraison', // Adresse de livraison
     ];
 
     // Les colonnes à caster dans un type spécifique
