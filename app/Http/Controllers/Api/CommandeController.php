@@ -391,5 +391,129 @@ class CommandeController extends Controller
         ]);
     }
 
+    // Récupérer les commandes d'un utilisateur spécifique
+    /**
+     * @OA\Get(
+     *     path="/api/commandes/user/{userId}",
+     *     summary="Lister les commandes d'un utilisateur",
+     *     tags={"Commandes"},
+     *     @OA\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="ID de l'utilisateur",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des commandes de l'utilisateur",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="numero", type="string", example="CMD-20250513-XYZ"),
+     *                 @OA\Property(property="statut", type="string", example="En attente"),
+     *                 @OA\Property(property="prix", type="integer", example=15000),
+     *                 @OA\Property(property="commentaire", type="string", example="Livraison rapide svp"),
+     *                 @OA\Property(property="isLivrable", type="boolean", example=true),
+     *                 @OA\Property(property="user_id", type="integer", example=1),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-05-13T12:00:00Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-05-13T12:10:00Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Utilisateur non trouvé ou aucune commande"
+     *     )
+     * )
+     */
+    public function getUserCommandes($userId)
+    {
+        $user = User::findOrFail($userId);
+        $commandes = $user->commandes()->with('articles')->get();
+
+        if ($commandes->isEmpty()) {
+            return response()->json(['message' => 'Aucune commande trouvée pour cet utilisateur.'], 404);
+        }
+
+        return response()->json($commandes);
+    }
+
+    // Récupérer les articles d'une commande d'un utilisateur spécifique
+    /**
+     * @OA\Get(
+     *     path="/api/commandes/{commandeId}/articles",
+     *     summary="Lister les articles d'une commande spécifique",
+     *     tags={"Commandes"},
+     *     @OA\Parameter(
+     *         name="commandeId",
+     *         in="path",
+     *         description="ID de la commande",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des articles de la commande",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=10),
+     *                 @OA\Property(property="nom", type="string", example="T-shirt Gabon"),
+     *                 @OA\Property(property="quantite", type="integer", example=2),
+     *                 @OA\Property(property="prix_unitaire", type="integer", example=5000),
+     *                 @OA\Property(property="variation_id", type="integer", nullable=true, example=4)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Commande non trouvée"
+     *     )
+     * )
+     */
+    public function getCommandeArticles($commandeId)
+    {
+        $commande = Commande::with('articles')->findOrFail($commandeId);
+
+        if ($commande->articles->isEmpty()) {
+            return response()->json(['message' => 'Aucun article trouvé pour cette commande.'], 404);
+        }
+
+        return response()->json($commande->articles);
+    }
+    /**
+     * @OA\Delete(
+     *     path="/api/commandes/{id}",
+     *     summary="Supprimer une commande",
+     *     tags={"Commandes"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la commande à supprimer",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Commande supprimée avec succès"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Commande non trouvée"
+     *     )
+     * )
+     */
+    public function destroy($id)
+    {
+        $commande = Commande::findOrFail($id);
+        $commande->delete();
+
+        return response()->json(null, 204);
+    }
+
 
 }

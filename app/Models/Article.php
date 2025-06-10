@@ -48,6 +48,12 @@ class Article extends Model
             ->withTimestamps();
     }
 
+    public function articleCommandes()
+    {
+        return $this->hasMany(ArticleCommande::class);
+    }
+
+
 
     // public function images()
     // {

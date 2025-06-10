@@ -665,7 +665,7 @@
                                     },
                                     "adresse_livraison": {
                                         "type": "string",
-                                        "example": "Libreville, quartier Louis"
+                                        "example": "Libreville"
                                     },
                                     "articles": {
                                         "type": "array",
@@ -741,7 +741,7 @@
                                                 },
                                                 "adresse_livraison": {
                                                     "type": "string",
-                                                    "example": "Libreville, quartier Louis"
+                                                    "example": "Libreville"
                                                 },
                                                 "articles": {
                                                     "type": "array",
@@ -899,6 +899,33 @@
                         "description": "Commande non trouvée"
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Supprimer une commande",
+                "operationId": "c9c7efaf1060052c76b9f876d73ab7b8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la commande à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Commande supprimée avec succès"
+                    },
+                    "404": {
+                        "description": "Commande non trouvée"
+                    }
+                }
             }
         },
         "/api/commandes/{id}/statut": {
@@ -982,6 +1009,147 @@
                     },
                     "422": {
                         "description": "Validation échouée"
+                    },
+                    "404": {
+                        "description": "Commande non trouvée"
+                    }
+                }
+            }
+        },
+        "/api/commandes/user/{userId}": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Lister les commandes d'un utilisateur",
+                "operationId": "b24b2be2ed4bb703c7b14f68026a27b9",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID de l'utilisateur",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des commandes de l'utilisateur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "numero": {
+                                                "type": "string",
+                                                "example": "CMD-20250513-XYZ"
+                                            },
+                                            "statut": {
+                                                "type": "string",
+                                                "example": "En attente"
+                                            },
+                                            "prix": {
+                                                "type": "integer",
+                                                "example": 15000
+                                            },
+                                            "commentaire": {
+                                                "type": "string",
+                                                "example": "Livraison rapide svp"
+                                            },
+                                            "isLivrable": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "user_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-05-13T12:00:00Z"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-05-13T12:10:00Z"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Utilisateur non trouvé ou aucune commande"
+                    }
+                }
+            }
+        },
+        "/api/commandes/{commandeId}/articles": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Lister les articles d'une commande spécifique",
+                "operationId": "c91efcfbdf9ea6c5d4e0cfc1d95eb0bc",
+                "parameters": [
+                    {
+                        "name": "commandeId",
+                        "in": "path",
+                        "description": "ID de la commande",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des articles de la commande",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "nom": {
+                                                "type": "string",
+                                                "example": "T-shirt Gabon"
+                                            },
+                                            "quantite": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "prix_unitaire": {
+                                                "type": "integer",
+                                                "example": 5000
+                                            },
+                                            "variation_id": {
+                                                "type": "integer",
+                                                "example": 4,
+                                                "nullable": true
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Commande non trouvée"
@@ -1207,32 +1375,125 @@
                 }
             }
         },
-        "/api/users/{id}/commandes": {
+        "/api/boutique/articles-commandes": {
             "get": {
                 "tags": [
-                    "Utilisateurs"
+                    "Boutique"
                 ],
-                "summary": "Afficher les commandes de l'utilisateur",
-                "operationId": "b1033319a0390eac122d8b0bb1b8507b",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID de l'utilisateur",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
+                "summary": "Liste des articles commandés d'un utilisateur boutique avec variations",
+                "operationId": "9a03b9959483d921f982bff5296f4270",
                 "responses": {
                     "200": {
-                        "description": "Liste des commandes"
+                        "description": "Liste des articles commandés avec variations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "article_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "nom": {
+                                                "type": "string",
+                                                "example": "T-shirt coton"
+                                            },
+                                            "commandes": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "commande_id": {
+                                                            "type": "integer",
+                                                            "example": 101
+                                                        },
+                                                        "quantite": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        },
+                                                        "prix": {
+                                                            "type": "integer",
+                                                            "example": 8500
+                                                        },
+                                                        "reduction": {
+                                                            "type": "integer",
+                                                            "example": 500
+                                                        },
+                                                        "variation": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 5
+                                                                },
+                                                                "taille": {
+                                                                    "type": "string",
+                                                                    "example": "L"
+                                                                },
+                                                                "couleur": {
+                                                                    "type": "string",
+                                                                    "example": "Noir"
+                                                                },
+                                                                "stock": {
+                                                                    "type": "integer",
+                                                                    "example": 10
+                                                                },
+                                                                "prix": {
+                                                                    "type": "integer",
+                                                                    "example": 8500
+                                                                }
+                                                            },
+                                                            "type": "object",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "404": {
-                        "description": "Utilisateur non trouvé"
+                    "403": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Non autorisé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctumAuth": []
+                    }
+                ]
             }
         }
     },
@@ -1549,6 +1810,10 @@
         {
             "name": "Utilisateurs",
             "description": "Utilisateurs"
+        },
+        {
+            "name": "Boutique",
+            "description": "Boutique"
         }
     ]
 }

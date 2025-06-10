@@ -30,4 +30,11 @@ class ArticleCommande extends Model
     {
         return $this->belongsTo(Commande::class);
     }
+
+    public function variation()
+    {
+        return $this->belongsTo(Variation::class);
+    }
+
+
 }

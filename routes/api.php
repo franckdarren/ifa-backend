@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/{id}/commandes', [UserController::class, 'commandes']); // Liste les commandes
     Route::get('/users/{id}/livraisons', [UserController::class, 'livraisons']); // Liste les livraisons
     Route::get('/users/{id}/reclamations', [UserController::class, 'reclamations']); // Liste les reclamations
+    Route::get('/boutique/articles-commandes', [UserController::class, 'articlesCommandes']);
 
 
     // Gestion Publicités
@@ -74,6 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/articles/categorie/{categorie}', [ArticleController::class, 'articlesCategorie']);
     Route::get('/articles/promotion', [ArticleController::class, 'articlesPromotion']);
     Route::get('/articles/recherche/{query}', [ArticleController::class, 'searchArticles']);
+
 
 
     // Gestion des article_commandes

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use Exception;
 use App\Models\User;
+use App\Models\Article;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
@@ -275,35 +277,101 @@ class UserController extends Controller
         return response()->json($reclamations, 200);
     }
 
+    // Recuperer les articles dune boutique dans une commande
     /**
      * @OA\Get(
-     *     path="/api/users/{id}/commandes",
-     *     summary="Afficher les commandes de l'utilisateur",
-     *     tags={"Utilisateurs"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID de l'utilisateur",
-     *         @OA\Schema(type="integer")
+     *     path="/api/boutique/articles-commandes",
+     *     summary="Liste des articles commandés d'un utilisateur boutique avec variations",
+     *     tags={"Boutique"},
+     *     security={{"sanctumAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des articles commandés avec variations",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="article_id", type="integer", example=1),
+     *                 @OA\Property(property="nom", type="string", example="T-shirt coton"),
+     *                 @OA\Property(
+     *                     property="commandes",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="commande_id", type="integer", example=101),
+     *                         @OA\Property(property="quantite", type="integer", example=3),
+     *                         @OA\Property(property="prix", type="integer", example=8500),
+     *                         @OA\Property(property="reduction", type="integer", example=500),
+     *                         @OA\Property(
+     *                             property="variation",
+     *                             type="object",
+     *                             nullable=true,
+     *                             @OA\Property(property="id", type="integer", example=5),
+     *                             @OA\Property(property="taille", type="string", example="L"),
+     *                             @OA\Property(property="couleur", type="string", example="Noir"),
+     *                             @OA\Property(property="stock", type="integer", example=10),
+     *                             @OA\Property(property="prix", type="integer", example=8500)
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
      *     ),
-     *     @OA\Response(response=200, description="Liste des commandes"),
-     *     @OA\Response(response=404, description="Utilisateur non trouvé")
+     *     @OA\Response(
+     *         response=403,
+     *         description="Non autorisé",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Non autorisé")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     )
      * )
      */
-    public function commandes(string $id)
-    {
-        //Supprimer un user
-        $user = User::find($id);
 
-        if (!$user) {
-            return response()->json(['message' => 'Utilisateur non trouvé'], 404);
+
+    public function articlesCommandes()
+    {
+        $user = Auth::user();
+
+        if ($user->type !== 'boutique') {
+            return response()->json(['message' => 'Non autorisé'], 403);
         }
 
-        $commandes = $user->commandes();
+        // Récupère les articles avec commandes et variations
+        $articles = Article::with(['articleCommandes.commande', 'articleCommandes.variation'])
+            ->where('user_id', $user->id)
+            ->whereHas('articleCommandes')
+            ->get();
 
-        return response()->json($commandes, 200);
+        $data = $articles->map(function ($article) {
+            return [
+                'article_id' => $article->id,
+                'nom' => $article->nom,
+                'commandes' => $article->articleCommandes->map(function ($ac) {
+                    return [
+                        'commande_id' => $ac->commande_id,
+                        'quantite' => $ac->quantite,
+                        'prix' => $ac->prix,
+                        'reduction' => $ac->reduction,
+                        'variation' => $ac->variation ? [
+                            'id' => $ac->variation->id,
+                            'taille' => $ac->variation->taille ?? null,
+                            'couleur' => $ac->variation->couleur ?? null,
+                            'stock' => $ac->variation->stock ?? null,
+                            'prix' => $ac->variation->prix ?? null,
+                        ] : null,
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json($data);
     }
+
 
 
 
