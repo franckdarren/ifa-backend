@@ -127,9 +127,18 @@ class CommandeController extends Controller
 
             $admin = User::admin();
 
+            if (!$admin) {
+                throw new \Exception("Aucun administrateur trouvé. Vérifiez la méthode User::admin().");
+            }
+
+            $boutiqueIds = [];
+
             foreach ($validated['articles'] as $item) {
                 $article = Article::findOrFail($item['article_id']);
                 $quantite = $item['quantite'];
+
+                // Stocker l'ID de la boutique si pas déjà ajouté
+                $boutiqueIds[] = $article->boutique_id;
 
                 if (!empty($item['variation_id'])) {
                     $variation = $article->variations()
@@ -168,16 +177,30 @@ class CommandeController extends Controller
                 }
 
                 $benefice = $sousTotal - $frais;
-                $article->boutique->increment('solde', $benefice);
+
+                if ($article->user) {
+                    $article->user->increment('solde', $benefice);
+                } else {
+                    throw new \Exception("L'article ID {$article->id} n'est associé à aucune boutique.");
+                }
+
                 $adminFrais += $frais;
             }
 
             // Ajouter les frais de livraison selon la ville
-            $livraison = match (strtolower($validated['adresse_livraison'])) {
-                'libreville' => 2000,
+            $baseLivraison = match (strtolower($validated['adresse_livraison'])) {
+                'libreville' => 2500,
                 'akanda' => 2000,
-                default => 2500,
+                'owendo' => 3000,
+                default => 3000,
             };
+
+
+            // Calcul du tarif en fonction du nombre de boutiques différentes
+            $nombreBoutiques = count(array_unique($boutiqueIds));
+            $livraison = min($baseLivraison * $nombreBoutiques, 8000); // plafonné à 8000 FCFA
+
+            // Ajouter la livraison au total
             $total += $livraison;
 
             // Mise à jour du solde admin et du prix total de la commande
