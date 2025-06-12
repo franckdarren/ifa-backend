@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class ArticleCommande extends Model
 {
     // Nom de la table associée
-    protected $table = 'article_commandes';
+    protected $table = 'commande_articles';
+
 
     // Attributs pouvant être assignés en masse
     protected $fillable = ['article_id', 'commande_id', 'quantite', 'prix', 'reduction'];

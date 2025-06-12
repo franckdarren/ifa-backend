@@ -29,51 +29,59 @@ class ListCommande extends Component implements HasForms, HasTable
     {
         return $table
             ->query(ArticleCommande::query()->orderBy('created_at', 'desc'))
-            // ->paginated(false)
             ->columns([
                 TextColumn::make('commande.numero')
-                    ->label('Numero')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('prix')
-                    ->label('Prix')
-                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
-                    ->summarize(Sum::make()->suffix(' FCFA'))
-                    ->searchable(),
-
-                TextColumn::make('commande.statut')
-                    ->label('Statut')
-                    ->searchable(),
-
-                TextColumn::make('commande.commentaire')
-                    ->label('Commentaire')
-                    ->searchable(),
-
-                TextColumn::make('commande.isLivrable')
-                    ->label('Avec livraison')
-                    ->formatStateUsing(fn($state) => $state ? 'Oui' : 'Non')
+                    ->label('Commande')
+                    ->sortable()
                     ->searchable(),
 
                 TextColumn::make('commande.user.name')
-                    ->label('Utilisateur')
+                    ->label('Client')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('article.nom')
+                    ->label('Article')
                     ->searchable(),
 
                 TextColumn::make('article.boutique.nom')
                     ->label('Vendeur')
                     ->searchable(),
-            ])
-            ->headerActions([
+
+                TextColumn::make('quantite')
+                    ->label('Quantité')
+                    ->sortable()
+                    ->summarize(Sum::make()),
+
+                TextColumn::make('prix_unitaire')
+                    ->label('Prix unitaire')
+                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
+                    ->summarize(Sum::make()->suffix(' FCFA')),
+
+                TextColumn::make('commande.prix')
+                    ->label('Montant commande')
+                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA'),
+
+
+                TextColumn::make('commande.statut')
+                    ->label('Statut')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'En attente' => 'warning',
+                        'Prête pour livraison' => 'success',
+                        'En cours de livraison' => 'success',
+                        'Livrée' => 'success',
+                        'Remboursée' => 'danger',
+                        'Annulée' => 'danger',
+                        default => 'gray',
+                    }),
+
 
             ])
-            ->filters([
-            ])
-            ->actions([
-
-            ])
-            ->bulkActions([])
-            ->defaultGroup('commande.numero');
-        ;
+            ->defaultGroup('commande.numero') // 👈 groupement par numéro de commande
+            ->filters([])
+            ->actions([])
+            ->bulkActions([]);
     }
     public function render()
     {
