@@ -151,12 +151,15 @@ class CommandeController extends Controller
                     }
 
                     $variation->decrement('stock', $quantite);
-                    $prixUnitaire = $variation->prix != 0
-                        ? $variation->prix
-                        : ($article->isPromotion ? $article->prixPromotion : $article->prix);
+
+                    // Logique du prix unitaire
+                    $prixUnitaire = $article->isPromotion
+                        ? $article->prixPromotion
+                        : ($variation->prix != 0 ? $variation->prix : $article->prix);
                 } else {
                     $prixUnitaire = $article->isPromotion ? $article->prixPromotion : $article->prix;
                 }
+
 
                 $sousTotal = $prixUnitaire * $quantite;
                 $total += $sousTotal;
