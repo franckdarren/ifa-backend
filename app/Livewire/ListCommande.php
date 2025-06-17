@@ -55,8 +55,8 @@ class ListCommande extends Component implements HasForms, HasTable
 
                 TextColumn::make('prix_unitaire')
                     ->label('Prix unitaire')
-                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA')
-                    ->summarize(Sum::make()->suffix(' FCFA')),
+                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', ' ') . ' FCFA'),
+                // ->summarize(Sum::make()->suffix(' FCFA')),
 
                 TextColumn::make('commande.prix')
                     ->label('Montant commande')
