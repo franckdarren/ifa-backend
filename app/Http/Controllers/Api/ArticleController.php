@@ -413,4 +413,29 @@ class ArticleController extends Controller
         return response()->json($articles, 200);
     }
 
+    // Lister les nouveaux articles
+    /**
+     * @OA\Get(
+     *     path="/api/articles/nouveaux",
+     *     summary="Lister les nouveaux articles",
+     *     tags={"Articles"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Nouveaux articles récupérés"
+     *     )
+     * )
+     */
+    public function nouveauxArticles()
+    {
+        $articles = Article::with(['variations'])
+            ->orderBy('created_at', 'desc')
+            ->take(10) // Limite à 10 articles les plus récents
+            ->get();
+
+        if ($articles->isEmpty()) {
+            return response()->json(['message' => 'Aucun nouvel article trouvé'], 404);
+        }
+
+        return response()->json($articles, 200);
+    }
 }

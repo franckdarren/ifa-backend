@@ -75,6 +75,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/articles/categorie/{categorie}', [ArticleController::class, 'articlesCategorie']);
     Route::get('/articles/promotion', [ArticleController::class, 'articlesPromotion']);
     Route::get('/articles/recherche/{query}', [ArticleController::class, 'searchArticles']);
+    Route::get('/articles/nouveaux', [ArticleController::class, 'nouveauxArticles']);
+
 
 
 
