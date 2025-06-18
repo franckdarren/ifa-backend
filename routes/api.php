@@ -67,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Gestion des articles
     Route::get('/articles', [ArticleController::class, 'index']);
     Route::get('/articles/nouveaux', [ArticleController::class, 'nouveauxArticles']);
+    Route::get('/articles/promotion', [ArticleController::class, 'articlesPromotion']);
     Route::post('/articles', [ArticleController::class, 'store']);
     Route::get('/articles/{id}', [ArticleController::class, 'show']);
     Route::put('/articles/{id}', [ArticleController::class, 'update']);
@@ -74,7 +75,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('articles-disponibles', [ArticleController::class, 'articlesDisponibles']);
     Route::get('articles/boutique/{id}', [ArticleController::class, 'articlesBoutique']);
     Route::get('/articles/categorie/{categorie}', [ArticleController::class, 'articlesCategorie']);
-    Route::get('/articles/promotion', [ArticleController::class, 'articlesPromotion']);
     Route::get('/articles/recherche/{query}', [ArticleController::class, 'searchArticles']);
 
 
