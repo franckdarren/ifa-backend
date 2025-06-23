@@ -42,7 +42,7 @@
                     </a>
                 @endif
 
-                <button class="ms-4 bg-blue-700 hover:bg-blue-800 focus:bg-blue-900 text-white px-3 py-2 rounded-md">
+                <button class="ms-4 bg-[#003159] hover:bg-blue-800 focus:bg-blue-900 text-white px-3 py-2 rounded-md">
                     {{ __('Log in') }}
                 </button>
             </div>
