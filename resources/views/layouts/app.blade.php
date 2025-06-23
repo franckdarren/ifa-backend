@@ -54,19 +54,19 @@
                     <nav class="mt-10">
                         <!-- Lien Tableau de bord -->
                         <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'duo-icons:dashboard\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'duo-icons:dashboard\' data-inline=\'false\'></span>'">
                             {{ __('Tableau de bord') }}
                         </x-nav-link>
 
                         <!-- Gestion articles -->
                         <x-nav-link href="{{ route('articles') }}" :active="request()->routeIs('articles')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'material-symbols:shop\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'material-symbols:shop\' data-inline=\'false\'></span>'">
                             {{ __('Articles') }}
                         </x-nav-link>
 
                         <!-- Gestion users -->
                         <x-nav-link href="{{ route('users') }}" :active="request()->routeIs('users')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'solar:shop-bold-duotone\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'solar:shop-bold-duotone\' data-inline=\'false\'></span>'">
                             {{ __('Utilisateurs') }}
                         </x-nav-link>
 
@@ -77,31 +77,31 @@
 
                         <!-- Gestion commandes -->
                         <x-nav-link href="{{ route('commandes') }}" :active="request()->routeIs('commandes')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'material-symbols:shopping-cart\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'material-symbols:shopping-cart\' data-inline=\'false\'></span>'">
                             {{ __('Commandes') }}
                         </x-nav-link>
 
                         <!-- Gestion livraisons -->
-                        <x-nav-link href="{{ route('livraisons') }}" :active="request()->routeIs('livraisons')" :icone="'<span class=\'iconify text-4xl\'
+                        {{-- <x-nav-link href="{{ route('livraisons') }}" :active="request()->routeIs('livraisons')" :icone="'<span class=\'iconify text-4xl\'
                                                                                                                                                                                                                                                                                                                                                                                 data-icon=\'material-symbols:local-shipping\' data-inline=\'false\'></span>'">
                             {{ __('Livraisons') }}
-                        </x-nav-link>
+                        </x-nav-link> --}}
 
                         <!-- Gestion publicites -->
                         <x-nav-link href="{{ route('publicites') }}" :active="request()->routeIs('publicites')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'material-symbols:campaign\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'material-symbols:campaign\' data-inline=\'false\'></span>'">
                             {{ __('Publicites') }}
                         </x-nav-link>
 
                         <!-- Gestion reclamations -->
                         <x-nav-link href="{{ route('reclamations') }}" :active="request()->routeIs('reclamations')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'material-symbols:error\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'material-symbols:error\' data-inline=\'false\'></span>'">
                             {{ __('Réclamations') }}
                         </x-nav-link>
 
                         {{-- Profil --}}
                         <x-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')" :icone="'<span class=\'iconify text-4xl\'
-                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'solar:user-bold-duotone\' data-inline=\'false\'></span>'">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                data-icon=\'solar:user-bold-duotone\' data-inline=\'false\'></span>'">
                             {{ __('Profil') }}
                         </x-nav-link>
 
