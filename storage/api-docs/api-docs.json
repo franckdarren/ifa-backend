@@ -293,6 +293,20 @@
                 }
             }
         },
+        "/api/articles/nouveaux": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Lister les nouveaux articles",
+                "operationId": "f16d29bfbdd19e4348a49bad4fe3a259",
+                "responses": {
+                    "200": {
+                        "description": "Nouveaux articles récupérés"
+                    }
+                }
+            }
+        },
         "/api/login": {
             "post": {
                 "tags": [
@@ -1157,6 +1171,217 @@
                 }
             }
         },
+        "/api/reclamations": {
+            "get": {
+                "tags": [
+                    "Réclamations"
+                ],
+                "summary": "Lister toutes les réclamations",
+                "operationId": "b567e26e1b4b03522e8f64f611f35314",
+                "responses": {
+                    "200": {
+                        "description": "Liste des réclamations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Reclamation"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Réclamations"
+                ],
+                "summary": "Créer une nouvelle réclamation",
+                "description": "Permet de créer une réclamation associée à une commande et un utilisateur",
+                "operationId": "storeReclamation",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "description",
+                                    "phone",
+                                    "statut",
+                                    "commande_id",
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Produit non conforme à la commande."
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "061234567"
+                                    },
+                                    "statut": {
+                                        "type": "string",
+                                        "enum": [
+                                            "En attente de traitement",
+                                            "En cours",
+                                            "Rejetée",
+                                            "Remboursée"
+                                        ],
+                                        "example": "En attente de traitement"
+                                    },
+                                    "commande_id": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Réclamation créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reclamation"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "description": [
+                                                    "Le champ description est requis."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reclamations/{id}": {
+            "get": {
+                "tags": [
+                    "Réclamations"
+                ],
+                "summary": "Afficher une réclamation spécifique",
+                "description": "Récupère une réclamation en fonction de son ID",
+                "operationId": "getReclamationById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la réclamation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Réclamation trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reclamation"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Réclamation non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Réclamation non trouvée"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Réclamations"
+                ],
+                "summary": "Supprimer une réclamation",
+                "description": "Supprime une réclamation en fonction de son ID",
+                "operationId": "deleteReclamation",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la réclamation à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Réclamation supprimée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Réclamation supprimée avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Réclamation non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Réclamation non trouvée"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/users": {
             "get": {
                 "tags": [
@@ -1572,6 +1797,58 @@
                 },
                 "type": "object"
             },
+            "Reclamation": {
+                "required": [
+                    "description",
+                    "phone",
+                    "statut",
+                    "commande_id",
+                    "user_id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Produit non conforme à la commande."
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "061234567"
+                    },
+                    "statut": {
+                        "type": "string",
+                        "enum": [
+                            "En attente de traitement",
+                            "En cours",
+                            "Rejetée",
+                            "Remboursée"
+                        ],
+                        "example": "En attente de traitement"
+                    },
+                    "commande_id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-06-27T08:30:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-06-27T08:45:00Z"
+                    }
+                },
+                "type": "object"
+            },
             "User": {
                 "title": "User",
                 "required": [
@@ -1806,6 +2083,10 @@
         {
             "name": "Commandes",
             "description": "Commandes"
+        },
+        {
+            "name": "Réclamations",
+            "description": "Réclamations"
         },
         {
             "name": "Utilisateurs",
