@@ -98,8 +98,8 @@ class ArticleController extends Controller
 
 
             'variations' => 'required|array|min:1',
-            'variations.*.taille' => 'required|string',
-            'variations.*.couleur' => 'required|string',
+            'variations.*.taille' => 'string',
+            'variations.*.couleur' => 'string',
             'variations.*.stock' => 'required|integer|min:0',
             'variations.*.prix' => 'required|numeric',
             // 'variations.*.image' => 'nullable|image|max:2048',
@@ -217,8 +217,8 @@ class ArticleController extends Controller
             'image_principale' => 'nullable|string', // ✅ on reste sur string comme dans store()
 
             'variations' => 'nullable|array|min:1',
-            'variations.*.taille' => 'required|string',
-            'variations.*.couleur' => 'required|string',
+            'variations.*.taille' => 'string',
+            'variations.*.couleur' => 'string',
             'variations.*.stock' => 'required|integer|min:0',
             'variations.*.prix' => 'required|numeric',
             'variations.*.image' => 'nullable|string',
