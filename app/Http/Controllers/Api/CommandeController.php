@@ -457,15 +457,24 @@ class CommandeController extends Controller
      */
     public function getUserCommandes($userId)
     {
-        $user = User::findOrFail($userId);
-        $commandes = $user->commandes()->with('articles')->get();
+        try {
+            $user = User::findOrFail($userId);
+            $commandes = $user->commandes()->with('articles')->get();
 
-        if ($commandes->isEmpty()) {
-            return response()->json(['message' => 'Aucune commande trouvée pour cet utilisateur.'], 404);
+            if ($commandes->isEmpty()) {
+                return response()->json(['message' => 'Aucune commande trouvée pour cet utilisateur.'], 404);
+            }
+
+            return response()->json($commandes);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erreur serveur',
+                'message' => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json($commandes);
     }
+
 
     // Récupérer les articles d'une commande d'un utilisateur spécifique
     /**
