@@ -476,6 +476,123 @@ class CommandeController extends Controller
     }
 
 
+
+    /**
+     * @OA\Get(
+     *     path="/api/boutiques/{id}/commandes",
+     *     summary="Récupérer les commandes reçues par une boutique",
+     *     description="Retourne la liste des commandes contenant des articles appartenant à une boutique spécifique (identifiée par son ID utilisateur). Chaque commande contient uniquement les articles publiés par cette boutique.",
+     *     tags={"Commandes"},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la boutique (user avec rôle 'Boutique')",
+     *         @OA\Schema(type="integer", example=5)
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des commandes de la boutique",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=2),
+     *                 @OA\Property(property="numero", type="string", example="CMD-686E7EAC01F98"),
+     *                 @OA\Property(property="statut", type="string", example="En attente"),
+     *                 @OA\Property(property="prix", type="number", format="float", example=383000),
+     *                 @OA\Property(property="commentaire", type="string", example="urgent"),
+     *                 @OA\Property(property="isLivrable", type="boolean", example=true),
+     *                 @OA\Property(property="adresse_livraison", type="string", example="Libreville"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                 @OA\Property(
+     *                     property="articles",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=4),
+     *                         @OA\Property(property="nom", type="string", example="iPhone 12"),
+     *                         @OA\Property(property="description", type="string", example="128 giga"),
+     *                         @OA\Property(property="prix", type="number", format="float", example=200000),
+     *                         @OA\Property(property="prixPromotion", type="number", format="float", nullable=true, example=190000),
+     *                         @OA\Property(property="isPromotion", type="boolean", example=true),
+     *                         @OA\Property(property="pourcentageReduction", type="integer", example=10),
+     *                         @OA\Property(property="madeInGabon", type="boolean", example=false),
+     *                         @OA\Property(property="user_id", type="integer", example=5),
+     *                         @OA\Property(property="categorie", type="string", example="Électronique"),
+     *                         @OA\Property(property="image_principale", type="string", example="https://..."),
+     *                         @OA\Property(property="created_at", type="string", format="date-time"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                         @OA\Property(
+     *                             property="pivot",
+     *                             type="object",
+     *                             @OA\Property(property="commande_id", type="integer", example=2),
+     *                             @OA\Property(property="article_id", type="integer", example=4),
+     *                             @OA\Property(property="quantite", type="integer", example=2),
+     *                             @OA\Property(property="prix_unitaire", type="number", example=190000),
+     *                             @OA\Property(property="variation_id", type="integer", example=8),
+     *                             @OA\Property(property="created_at", type="string", format="date-time"),
+     *                             @OA\Property(property="updated_at", type="string", format="date-time")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Aucune commande trouvée pour cette boutique.",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Aucune commande trouvée pour cette boutique.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erreur serveur",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Erreur serveur"),
+     *             @OA\Property(property="message", type="string", example="SQLSTATE[HY000]: ...")
+     *         )
+     *     )
+     * )
+     */
+
+    public function getBoutiqueCommandes($boutiqueId)
+    {
+        try {
+            $boutique = User::findOrFail($boutiqueId);
+
+            // Filtrer les commandes contenant un article publié par cette boutique
+            $commandes = Commande::whereHas('articles', function ($query) use ($boutique) {
+                $query->where('user_id', $boutique->id);
+            })->with([
+                        'articles' => function ($query) use ($boutique) {
+                            // Charger uniquement les articles de cette boutique
+                            $query->where('user_id', $boutique->id);
+                        }
+                    ])->get();
+
+            if ($commandes->isEmpty()) {
+                return response()->json(['message' => 'Aucune commande trouvée pour cette boutique.'], 404);
+            }
+
+            return response()->json($commandes);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erreur serveur',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
     // Récupérer les articles d'une commande d'un utilisateur spécifique
     /**
      * @OA\Get(

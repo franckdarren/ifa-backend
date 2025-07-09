@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::delete('/commandes/{id}', [CommandeController::class, 'destroy']);
     Route::patch('/commandes/{id}/statut', [CommandeController::class, 'updateStatus']);
     Route::get('/commandes/user/{userId}', [CommandeController::class, 'getUserCommandes']);
+    Route::get('/commandes/boutique/{boutiqueId}', [CommandeController::class, 'getBoutiqueCommandes']);
     Route::get('/commandes/{commandeId}/articles', [CommandeController::class, 'getCommandeArticles']);
 
 
