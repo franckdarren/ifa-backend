@@ -470,7 +470,8 @@ class CommandeController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Erreur serveur',
-                'message' => $e->getMessage(),
+                'message' => 'Une erreur inattendue est survenue.',
+                ,
             ], 500);
         }
     }
