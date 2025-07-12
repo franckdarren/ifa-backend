@@ -479,7 +479,7 @@ class CommandeController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/boutiques/{id}/commandes",
+     *     path="/api/commandes/boutique/{boutiqueId}",
      *     summary="Récupérer les commandes reçues par une boutique",
      *     description="Retourne la liste des commandes contenant des articles appartenant à une boutique spécifique (identifiée par son ID utilisateur). Chaque commande contient uniquement les articles publiés par cette boutique.",
      *     tags={"Commandes"},
