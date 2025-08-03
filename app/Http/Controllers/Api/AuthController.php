@@ -127,14 +127,14 @@ class AuthController extends Controller
         $firebaseUid = $request->input('firebase_uid');
         $email = $request->input('email');
         $name = $request->input('name');
-        $password = $request->input('password');
+        // $password = $request->input('password');
 
 
         if (!in_array($role, $allowedRoles)) {
             return response()->json(['error' => 'Rôle invalide'], 422);
         }
 
-        if (!$firebaseUid || !$email || !$name || !$password) {
+        if (!$firebaseUid || !$email || !$name) {
             return response()->json(['error' => 'Données incomplètes'], 422);
         }
 
@@ -150,7 +150,7 @@ class AuthController extends Controller
                 'email' => $email,
                 'role' => $role,
                 'firebase_uid' => $firebaseUid,
-                'password' => $password, // Pas de mot de passe
+                // 'password' => $password, // Pas de mot de passe
             ]);
         }
 
